@@ -85,12 +85,13 @@ int main() {
 
     for (int i = 0; i < SIZE; i++)
     {
-        price[i] = rand() % (PL + PH) + PL;
-        strike[i] = rand() % (SL + SH) + SL;
+        price[i] = rand() % (PH - PL) + PL;
+        strike[i] = rand() % (SH - SL) + SL;
     }
 
     black_scholes(price, strike, RISK_FREE, VOLATILITY, SIZE, q);
 
     cl::sycl::free(price, q);
+    
     cl::sycl::free(strike, q);
 }
