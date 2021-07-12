@@ -1,11 +1,11 @@
 #include <CL/sycl.hpp>
 #include <iostream>
 
-cl::sycl::event divide_sycl(double* price,
-                            double* strike,
+cl::sycl::event divide_sycl(cl::sycl::queue q,
                             const size_t size,
-                            double* p_div_s,
-                            cl::sycl::queue q)
+                            double* price,
+                            double* strike,
+                            double* p_div_s)
 {
     double* P = sycl::malloc_shared<double>(size, q);
     double* S = sycl::malloc_shared<double>(size, q);
