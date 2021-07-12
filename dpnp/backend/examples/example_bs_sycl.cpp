@@ -1,38 +1,38 @@
 #include <CL/sycl.hpp>
 #include <iostream>
 
-double* divide_sycl(double* price,
-                    double* strike,
-                    const size_t size,
-                    cl::sycl::queue q)
+cl::sycl::event divide_sycl(double* price,
+                            double* strike,
+                            const size_t size,
+                            double* p_div_s,
+                            cl::sycl::queue q)
 {
     double* P = sycl::malloc_shared<double>(size, q);
     double* S = sycl::malloc_shared<double>(size, q);
-    double* p_div_s = sycl::malloc_shared<double>(size, q);
 
     P = price;
     S = strike;
 
-    q.submit([&](sycl::handler &cgh) {
+    cl::sycl::event event = q.submit([&](sycl::handler &cgh) {
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { p_div_s[i] = P[i] / S[i];});
     });
-    q.wait();
-    
-    return p_div_s;
-    
+
+    cl::sycl::free(P, q);
+    cl::sycl::free(S, q);
+
+    return event;  
 }
 
-double* log_sycl(const size_t size,
-                 double* p_div_s,
-                 cl::sycl::queue q)
+cl::sycl::event log_sycl(const size_t size,
+                         double* p_div_s,
+                         double* log_,
+                         cl::sycl::queue q)
 {
-    double* log_ = sycl::malloc_shared<double>(size, q);
-    q.submit([&](sycl::handler &cgh) {
+    cl::sycl::event event = q.submit([&](sycl::handler &cgh) {
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { log_[i] = cl::sycl::log(p_div_s[i]);});
     });
-    q.wait();
 
-    return log_;
+    return event;
 }
 
 
@@ -40,23 +40,30 @@ void black_scholes(double* price,
                    double* strike,
                    const double rate,
                    const double vol,
-                   const size_t size)
+                   const size_t size,
+                   cl::sycl::queue q)
 {
-    cl::sycl::queue q{sycl::gpu_selector{}};
-
     // ------------ dividing ----------
-    double(*p_div_s) = new double[size];
-    p_div_s = divide_sycl(price, strike, size, q);
+    double(*p_div_s) = sycl::malloc_shared<double>(size, q);
+
+    cl::sycl::event event;
+    event = divide_sycl(price, strike, size, p_div_s, q);
+    event.wait();
 
     for (int i = 0; i < size; ++i)
         std::cout << price[i] << " / " << strike[i] << " = " << p_div_s[i] << "\n";
 
     // ------------ log ----------
-    double(*log_) = new double[size];
-    log_ = log_sycl(size, p_div_s, q);
+    double(*log_) = sycl::malloc_shared<double>(size, q);
+
+    event = log_sycl(size, p_div_s, log_, q);
+    event.wait();
 
     for (int i = 0; i < size; ++i)
         std::cout << log_[i] << "\n";
+    
+    cl::sycl::free(p_div_s, q);
+    cl::sycl::free(log_, q);
 }
 
 
@@ -70,9 +77,11 @@ int main() {
     const double RISK_FREE = 0.1;
     const double VOLATILITY = 0.2;
     
+    cl::sycl::queue q{sycl::gpu_selector{}};
+
     //------ example -------
-    double(*price) = new double[SIZE];
-    double(*strike) = new double[SIZE];
+    double(*price) = sycl::malloc_shared<double>(SIZE, q);
+    double(*strike) = sycl::malloc_shared<double>(SIZE, q);
 
     for (int i = 0; i < SIZE; i++)
     {
@@ -80,5 +89,8 @@ int main() {
         strike[i] = rand() % (SL + SH) + SL;
     }
 
-    black_scholes(price, strike, RISK_FREE, VOLATILITY, SIZE);
+    black_scholes(price, strike, RISK_FREE, VOLATILITY, SIZE, q);
+
+    cl::sycl::free(price, q);
+    cl::sycl::free(strike, q);
 }
