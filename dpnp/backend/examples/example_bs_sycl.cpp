@@ -1,46 +1,38 @@
 #include <CL/sycl.hpp>
 #include <iostream>
 
-cl::sycl::buffer<double> divide_sycl(double* price,
-                                     double* strike,
-                                     const size_t size,
-                                     cl::sycl::queue q)
+double* divide_sycl(double* price,
+                    double* strike,
+                    const size_t size,
+                    cl::sycl::queue q)
 {
-    double* pr_div_st = new double[size];
+    double* P = sycl::malloc_shared<double>(size, q);
+    double* S = sycl::malloc_shared<double>(size, q);
+    double* p_div_s = sycl::malloc_shared<double>(size, q);
 
-    cl::sycl::buffer P_buf(reinterpret_cast<double*> (price), cl::sycl::range(size)); 
-    cl::sycl::buffer S_buf(reinterpret_cast<double*> (strike), cl::sycl::range(size)); 
-    cl::sycl::buffer p_div_s_buf(reinterpret_cast<double*> (pr_div_st), cl::sycl::range(size)); 
+    P = price;
+    S = strike;
 
     q.submit([&](sycl::handler &cgh) {
-        auto P = P_buf.get_access<cl::sycl::access::mode::read>(cgh);
-        auto S = S_buf.get_access<cl::sycl::access::mode::read>(cgh);
-        auto p_div_s = p_div_s_buf.get_access<cl::sycl::access::mode::write>(cgh);
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { p_div_s[i] = P[i] / S[i];});
     });
     q.wait();
     
-    return p_div_s_buf;
+    return p_div_s;
     
 }
 
-
-cl::sycl::buffer<double> log_sycl(const size_t size,
-                                  cl::sycl::buffer<double> p_div_s_buf,
-                                  cl::sycl::queue q)
+double* log_sycl(const size_t size,
+                 double* p_div_s,
+                 cl::sycl::queue q)
 {
-    double* log = new double[size];
-
-    cl::sycl::buffer log_buf(reinterpret_cast<double*> (log), cl::sycl::range(size));
-
+    double* log_ = sycl::malloc_shared<double>(size, q);
     q.submit([&](sycl::handler &cgh) {
-        auto p_div_s = p_div_s_buf.get_access<cl::sycl::access::mode::read>(cgh);
-        auto log_ = log_buf.get_access<cl::sycl::access::mode::write>(cgh);  
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { log_[i] = cl::sycl::log(p_div_s[i]);});
     });
     q.wait();
 
-    return log_buf;
+    return log_;
 }
 
 
@@ -53,16 +45,16 @@ void black_scholes(double* price,
     cl::sycl::queue q{sycl::gpu_selector{}};
 
     // ------------ dividing ----------
-    cl::sycl::buffer p_div_s_buf = divide_sycl(price, strike, size, q);
+    double(*p_div_s) = new double[size];
+    p_div_s = divide_sycl(price, strike, size, q);
 
-    auto p_div_s = p_div_s_buf.get_access<cl::sycl::access::mode::read>();
     for (int i = 0; i < size; ++i)
         std::cout << price[i] << " / " << strike[i] << " = " << p_div_s[i] << "\n";
 
     // ------------ log ----------
-    cl::sycl::buffer log_buf = log_sycl(size, p_div_s_buf, q);
+    double(*log_) = new double[size];
+    log_ = log_sycl(size, p_div_s, q);
 
-    auto log_ = log_buf.get_access<cl::sycl::access::mode::read>();
     for (int i = 0; i < size; ++i)
         std::cout << log_[i] << "\n";
 }
