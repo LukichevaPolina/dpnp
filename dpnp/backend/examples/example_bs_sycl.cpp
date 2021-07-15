@@ -155,7 +155,6 @@ int median(std::vector<int> performance)
 }
 
 int main() {
-
     const size_t SIZE = 20;
     const size_t SEED = 7777777;
     const long PL = 10, PH = 50;
