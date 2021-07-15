@@ -307,7 +307,6 @@ double median(std::vector<double> times)
 }
 
 int main() {
-
     const size_t SIZE = 20;
     const size_t SEED = 7777777;
     const long PL = 10, PH = 50;
@@ -358,4 +357,5 @@ int main() {
     sycl::free(price, q);
     sycl::free(strike, q);
     sycl::free(t, q);
+
 }
