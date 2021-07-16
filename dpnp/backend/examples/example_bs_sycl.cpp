@@ -131,7 +131,7 @@ sycl::event add_scalar_to_array(sycl::queue q,
 {
     sycl::event event = q.submit([&](sycl::handler &cgh) {
         cgh.depends_on(deps);
-	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] + b;});
+        cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] + b;});
     });
 
     return event;
@@ -185,7 +185,7 @@ void black_scholes(double* price,
     sycl::event e_div = divide_array_by_array(q, dep_events_p_div_s, size, price, strike, p_div_s);
 
     if (sync)
-    	e_div.wait();
+        e_div.wait();
 
     // ------------ a = log(p_div_s) ------------
     std::vector<sycl::event> dep_events_a;
@@ -248,9 +248,7 @@ void black_scholes(double* price,
     //------------ a_sub_b = a - b ------------
     std::vector<sycl::event> dep_events_a_sub_b;
     if (!sync) 
-    {
         dep_events_a_sub_b.insert(dep_events_a_sub_b.end(), {e_a, e_b});
-    }
     double* a_sub_b = sycl::malloc_shared<double>(size, q);
     sycl::event e_a_sub_b = subtract(q, dep_events_a_sub_b, size, a, b, a_sub_b);
     if (sync)
@@ -261,9 +259,7 @@ void black_scholes(double* price,
     //------------ a_sub_b_add_c = a_sub_b + c ------------
     std::vector<sycl::event> dep_events_a_sub_b_add_c;
     if (!sync) 
-    {
         dep_events_a_sub_b_add_c.insert(dep_events_a_sub_b_add_c.end(), {e_c, e_a_sub_b});
-    }
     double* a_sub_b_add_c = sycl::malloc_shared<double>(size, q);
     sycl::event e_a_sub_b_add_c = add_arrays(q, dep_events_a_sub_b_add_c, size, a_sub_b, c, a_sub_b_add_c);
     if (sync)
@@ -271,9 +267,8 @@ void black_scholes(double* price,
 
     //------------ w1 = a_sub_b_add_c * y ------------
     std::vector<sycl::event> dep_events_w1;
-    if (!sync) {
+    if (!sync)
         dep_events_w1.insert(dep_events_w1.end(), {e_a_sub_b_add_c, e_y});
-    }
     double* w1 = sycl::malloc_shared<double>(size, q);
     sycl::event e_w1 = multiply_arrays(q, dep_events_w1, size, a_sub_b_add_c, y, w1);
     if (sync)
@@ -284,9 +279,7 @@ void black_scholes(double* price,
      //------------ a_sub_b_sub_c = a_sub_b - c ------------
     std::vector<sycl::event> dep_events_a_sub_b_sub_c;
     if (!sync) 
-    {
         dep_events_a_sub_b_sub_c.insert(dep_events_a_sub_b_sub_c.end(), {e_c, e_a_sub_b});
-    }
     double* a_sub_b_sub_c = sycl::malloc_shared<double>(size, q);
     sycl::event e_a_sub_b_sub_c = subtract(q, dep_events_a_sub_b_sub_c, size, a_sub_b, c, a_sub_b_sub_c);
     if (sync)
@@ -297,9 +290,8 @@ void black_scholes(double* price,
 
     //------------ w2 = a_sub_b_sub_c * y ------------
     std::vector<sycl::event> dep_events_w2;
-    if (!sync) {
+    if (!sync)
         dep_events_w2.insert(dep_events_w2.end(), {e_a_sub_b_sub_c, e_y});
-    }
     double* w2 = sycl::malloc_shared<double>(size, q);
     sycl::event e_w2 = multiply_arrays(q, dep_events_w2, size, a_sub_b_sub_c, y, w2);
     if (sync)
@@ -310,9 +302,8 @@ void black_scholes(double* price,
 
     //------------ erf_w1 = erf(w1) ------------
     std::vector<sycl::event> dep_events_erf_w1;
-    if (!sync) {
+    if (!sync)
         dep_events_erf_w1.push_back(e_w1);
-    }
     double* erf_w1 = sycl::malloc_shared<double>(size, q);
     sycl::event e_erf_w1 = erf(q, dep_events_erf_w1, size, w1, erf_w1);
     if (sync)
@@ -322,9 +313,8 @@ void black_scholes(double* price,
 
     //------------ halfs_mul_erf_w1 = halfs * erf_w1 ------------
     std::vector<sycl::event> dep_events_halfs_mul_erf_w1;
-    if (!sync) {
+    if (!sync)
         dep_events_halfs_mul_erf_w1.push_back(e_erf_w1);
-    }
     double* halfs_mul_erf_w1 = sycl::malloc_shared<double>(size, q);
     sycl::event e_halfs_mul_erf_w1 = multiply_array_by_scalar(q, dep_events_halfs_mul_erf_w1, size, erf_w1, 0.5, halfs_mul_erf_w1);
     if (sync)
@@ -334,9 +324,8 @@ void black_scholes(double* price,
 
     //------------ d1 = half + halfs_mul_erf_w1 ------------
     std::vector<sycl::event> dep_events_d1;
-    if (!sync) {
+    if (!sync)
         dep_events_d1.push_back(e_halfs_mul_erf_w1);
-    }
     double* d1 = sycl::malloc_shared<double>(size, q);
     sycl::event e_d1 = add_scalar_to_array(q, dep_events_d1, size, halfs_mul_erf_w1, 0.5, d1);
     if (sync)
@@ -346,9 +335,8 @@ void black_scholes(double* price,
 
     //------------ erf_w2 = erf(w2) ------------
     std::vector<sycl::event> dep_events_erf_w2;
-    if (!sync) {
+    if (!sync)
         dep_events_erf_w2.push_back(e_w2);
-    }
     double* erf_w2 = sycl::malloc_shared<double>(size, q);
     sycl::event e_erf_w2 = erf(q, dep_events_erf_w2, size, w2, erf_w2);
     if (sync)
@@ -358,9 +346,8 @@ void black_scholes(double* price,
 
     //------------ halfs_mul_erf_w2 = half * erf_w2 ------------
     std::vector<sycl::event> dep_events_halfs_mul_erf_w2;
-    if (!sync) {
+    if (!sync)
         dep_events_halfs_mul_erf_w2.push_back(e_erf_w2);
-    }
     double* halfs_mul_erf_w2 = sycl::malloc_shared<double>(size, q);
     sycl::event e_halfs_mul_erf_w2 = multiply_array_by_scalar(q, dep_events_halfs_mul_erf_w2, size, erf_w2, 0.5, halfs_mul_erf_w2);
     if (sync)
@@ -370,9 +357,8 @@ void black_scholes(double* price,
 
     //------------ d2 = halfs + halfs_mul_erf_w2 ------------
     std::vector<sycl::event> dep_events_d2;
-    if (!sync) {
+    if (!sync)
         dep_events_d2.push_back(e_halfs_mul_erf_w2);
-    }
     double* d2 = sycl::malloc_shared<double>(size, q);
     sycl::event e_d2 = add_scalar_to_array(q, dep_events_d2, size, halfs_mul_erf_w2, 0.5, d2);
     if (sync)
@@ -382,9 +368,8 @@ void black_scholes(double* price,
 
     //------------ exp_b = exp(b) ------------
     std::vector<sycl::event> dep_events_exp_b;
-    if (!sync) {
+    if (!sync)
         dep_events_exp_b.push_back(e_b);
-    }
     double* exp_b = sycl::malloc_shared<double>(size, q);
     sycl::event e_exp_b = exp(q, dep_events_exp_b, size, b, exp_b);
     if (sync)
@@ -394,9 +379,8 @@ void black_scholes(double* price,
 
     //------------ Se = exp_b * strike ------------
     std::vector<sycl::event> dep_events_Se;
-    if (!sync) {
+    if (!sync)
         dep_events_Se.push_back(e_exp_b);
-    }
     double* Se = sycl::malloc_shared<double>(size, q);
     sycl::event e_Se = multiply_arrays(q, dep_events_Se, size, exp_b, strike, Se);
     if (sync)
@@ -406,9 +390,8 @@ void black_scholes(double* price,
     
     //------------ P_mul_d1 = price * d1 ------------
     std::vector<sycl::event> dep_events_P_mul_d1;
-    if (!sync) {
+    if (!sync)
         dep_events_P_mul_d1.push_back(e_d1);
-    }
     double* P_mul_d1 = sycl::malloc_shared<double>(size, q);
     sycl::event e_P_mul_d1 = multiply_arrays(q, dep_events_P_mul_d1, size, price, d1, P_mul_d1);
     if (sync)
@@ -418,9 +401,8 @@ void black_scholes(double* price,
 
     //------------ Se_mul_d2 = Se * d2 ------------
     std::vector<sycl::event> dep_events_Se_mul_d2;
-    if (!sync) {
+    if (!sync)
         dep_events_Se_mul_d2.insert(dep_events_Se_mul_d2.end(), {e_Se, e_d2});
-    }
     double* Se_mul_d2 = sycl::malloc_shared<double>(size, q);
     sycl::event e_Se_mul_d2 = multiply_arrays(q, dep_events_Se_mul_d2, size, Se, d2, Se_mul_d2);
     if (sync)
@@ -430,9 +412,8 @@ void black_scholes(double* price,
 
     //------------ call = P_mul_d1 - Se_mul_d2 ------------
     std::vector<sycl::event> dep_events_call;
-    if (!sync) {
+    if (!sync)
         dep_events_call.insert(dep_events_call.end(), {e_P_mul_d1, e_Se_mul_d2});
-    }
     sycl::event e_call = subtract(q, dep_events_call, size, P_mul_d1, Se_mul_d2, call);
     
     e_call.wait();
@@ -442,9 +423,8 @@ void black_scholes(double* price,
     
     //------------ r_sub_P = r - P ------------
     std::vector<sycl::event> dep_events_call_sub_P;
-    if (!sync) {
+    if (!sync)
         dep_events_call_sub_P.push_back(e_call);
-    }
     double* call_sub_P = sycl::malloc_shared<double>(size, q);
     sycl::event e_call_sub_P = subtract(q, dep_events_call_sub_P, size, call, price, call_sub_P);
     if (sync)
@@ -452,9 +432,8 @@ void black_scholes(double* price,
 
     //------------ r_sub_P_add_Se = r_sub_P + Se ------------
     std::vector<sycl::event> dep_events_put;
-    if (!sync) {
+    if (!sync)
         dep_events_put.insert(dep_events_put.end(), {e_call, e_Se});
-    }
     sycl::event e_put = add_arrays(q, dep_events_put, size, call_sub_P, Se, put);
 
     e_put.wait();
