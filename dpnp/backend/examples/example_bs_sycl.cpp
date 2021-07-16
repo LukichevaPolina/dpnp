@@ -115,7 +115,7 @@ sycl::event add_arrays(sycl::queue q,
                        double* y)
 {
     sycl::event event = q.submit([&](sycl::handler &cgh) {
-	    cgh.depends_on(deps);
+	cgh.depends_on(deps);
         cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] + b[i];});
     });
 
@@ -130,8 +130,8 @@ sycl::event add_scalar_to_array(sycl::queue q,
                     		double* y)
 {
     sycl::event event = q.submit([&](sycl::handler &cgh) {
-        cgh.depends_on(deps);
-        cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] + b;});
+	cgh.depends_on(deps);
+	cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] + b;});
     });
 
     return event;
@@ -185,7 +185,7 @@ void black_scholes(double* price,
     sycl::event e_div = divide_array_by_array(q, dep_events_p_div_s, size, price, strike, p_div_s);
 
     if (sync)
-        e_div.wait();
+	e_div.wait();
 
     // ------------ a = log(p_div_s) ------------
     std::vector<sycl::event> dep_events_a;
