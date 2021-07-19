@@ -27,6 +27,7 @@ sycl::event divide_array_by_scalar(sycl::queue q,
                                    double* b,
                                    double* y)
 {
+    sycl::event event = q.submit([&](sycl::handler &cgh)
     {
         cgh.depends_on(deps);
         cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a / b[i];});
