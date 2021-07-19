@@ -11,9 +11,10 @@ sycl::event divide(sycl::queue q,
                                   double* b,
                                   double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
-	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] / b[i];}); 
+        cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] / b[i];}); 
     });
 
     return event;  
@@ -26,7 +27,8 @@ sycl::event divide_array_by_scalar(sycl::queue q,
                                     double* b,
                                     double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a / b[i];});
     });
@@ -40,7 +42,8 @@ sycl::event log(sycl::queue q,
                          double* a,
                          double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = sycl::log(a[i]);});
     });
@@ -55,7 +58,8 @@ sycl::event multiply_array_by_scalar(sycl::queue q,
                                          double b,
                                          double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] * b;});
     });
@@ -70,7 +74,8 @@ sycl::event multiply(sycl::queue q,
                                 double* b,
                                 double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] * b[i];});
     });
@@ -84,7 +89,8 @@ sycl::event sqrt(sycl::queue q,
                      double* a,
                      double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = sycl::sqrt(a[i]);});
     });
@@ -99,7 +105,8 @@ sycl::event subtract(sycl::queue q,
                             double* b,
                             double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] - b[i];});
     });
@@ -114,12 +121,9 @@ sycl::event add(sycl::queue q,
                     double* b,
                     double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
-<<<<<<< HEAD
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
-=======
-	    cgh.depends_on(deps);
->>>>>>> b95dea7f99839d0ad7e0d4afeee422907bc5a810
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] + b[i];});
     });
 
@@ -133,13 +137,10 @@ sycl::event add_scalar_to_array(sycl::queue q,
                     double b,
                     double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
-<<<<<<< HEAD
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
-=======
-	    cgh.depends_on(deps);
->>>>>>> b95dea7f99839d0ad7e0d4afeee422907bc5a810
-	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] + b;});
+        cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] + b;});
     });
 
     return event;
@@ -151,7 +152,8 @@ sycl::event erf(sycl::queue q,
                          double* a,
                          double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = sycl::erf(a[i]);});
     });
@@ -165,7 +167,8 @@ sycl::event exp(sycl::queue q,
                 double* a,
                 double* y)
 {
-    sycl::event event = q.submit([&](sycl::handler &cgh) {
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
         cgh.depends_on(deps);
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = sycl::exp(a[i]);});
     });
