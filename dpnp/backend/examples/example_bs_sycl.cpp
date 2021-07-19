@@ -115,7 +115,11 @@ sycl::event add(sycl::queue q,
                     double* y)
 {
     sycl::event event = q.submit([&](sycl::handler &cgh) {
+<<<<<<< HEAD
         cgh.depends_on(deps);
+=======
+	    cgh.depends_on(deps);
+>>>>>>> b95dea7f99839d0ad7e0d4afeee422907bc5a810
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] + b[i];});
     });
 
@@ -130,7 +134,11 @@ sycl::event add_scalar_to_array(sycl::queue q,
                     double* y)
 {
     sycl::event event = q.submit([&](sycl::handler &cgh) {
+<<<<<<< HEAD
         cgh.depends_on(deps);
+=======
+	    cgh.depends_on(deps);
+>>>>>>> b95dea7f99839d0ad7e0d4afeee422907bc5a810
 	    cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = a[i] + b;});
     });
 
