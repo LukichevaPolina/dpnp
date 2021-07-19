@@ -20,7 +20,7 @@ sycl::event divide(sycl::queue q,
     return event;  
 }
 
-sycl::event divide_array_by_scalar(sycl::queue q,
+sycl::event divide_scalar_by_array(sycl::queue q,
                                    std::vector<sycl::event> &deps,
                                    const size_t size,
                                    double a,
@@ -225,7 +225,7 @@ void black_scholes(double* price,
     if (sync)
         z_event.wait();
 
-    //------------ c = quartnes * z ------------
+    //------------ c = 0.25 * z ------------
     std::vector<sycl::event> c_deps;
     if (!sync)
         c_deps.push_back(z_event);
@@ -234,7 +234,7 @@ void black_scholes(double* price,
     if (sync)
         c_event.wait();
 
-    //------------ sqrt(z) ------------
+    //------------ sqrt_z = sqrt(z) ------------
     std::vector<sycl::event> sqrt_z_deps;
     if (!sync)
         sqrt_z_deps.push_back(z_event);
@@ -245,12 +245,12 @@ void black_scholes(double* price,
     
     sycl::free(z, q);
 
-    //------------ y = ones / sqrt(z) ------------
+    //------------ y = 1 / sqrt(z) ------------
     std::vector<sycl::event> y_deps;
     if (!sync)
         y_deps.push_back(sqrt_z_event);
     double* y = sycl::malloc_shared<double>(size, q);
-    sycl::event y_event = divide_array_by_scalar(q, y_deps, size, 1, sqrt_z, y);
+    sycl::event y_event = divide_scalar_by_array(q, y_deps, size, 1, sqrt_z, y);
     if (sync)
         y_event.wait();
 
@@ -337,7 +337,7 @@ void black_scholes(double* price,
     
     sycl::free(w1, q);
 
-    //------------ halfs_mul_erf_w1 = halfs * erf_w1 ------------
+    //------------ halfs_mul_erf_w1 = 0.5 * erf_w1 ------------
     std::vector<sycl::event> halfs_mul_erf_w1_deps;
     if (!sync) {
         halfs_mul_erf_w1_deps.push_back(erf_w1_event);
@@ -349,7 +349,7 @@ void black_scholes(double* price,
 
     sycl::free(erf_w1, q);
 
-    //------------ d1 = half + halfs_mul_erf_w1 ------------
+    //------------ d1 = 0.5 + halfs_mul_erf_w1 ------------
     std::vector<sycl::event> d1_deps;
     if (!sync) {
         d1_deps.push_back(halfs_mul_erf_w1_event);
@@ -373,7 +373,7 @@ void black_scholes(double* price,
 
     sycl::free(w2, q);
 
-    //------------ halfs_mul_erf_w2 = half * erf_w2 ------------
+    //------------ halfs_mul_erf_w2 = 0.5 * erf_w2 ------------
     std::vector<sycl::event> halfs_mul_erf_w2_deps;
     if (!sync) {
         halfs_mul_erf_w2_deps.push_back(erf_w2_event);
@@ -385,7 +385,7 @@ void black_scholes(double* price,
     
     sycl::free(erf_w2, q);
 
-    //------------ d2 = halfs + halfs_mul_erf_w2 ------------
+    //------------ d2 = 0.5 + halfs_mul_erf_w2 ------------
     std::vector<sycl::event> d2_deps;
     if (!sync) {
         d2_deps.push_back(halfs_mul_erf_w2_event);
