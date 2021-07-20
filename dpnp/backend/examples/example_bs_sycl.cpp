@@ -302,7 +302,7 @@ void black_scholes(double* price,
     double* p_div_s = sycl::malloc_shared<double>(size, q);
     itt_task_end;
 
-    itt_task_begin(handle_malloc_p_div_s);
+    itt_task_begin(handle_submit_p_div_s);
     sycl::event p_div_s_event = divide(q, p_div_s_deps, size, price, strike, p_div_s);
     itt_task_end;
 
@@ -613,7 +613,7 @@ void black_scholes(double* price,
     double* d1 = sycl::malloc_shared<double>(size, q);
     itt_task_end;
 
-    itt_task_begin(handle_wait_w2);
+    itt_task_begin(handle_submit_d1);
     sycl::event d1_event = add_scalar_to_array(q, d1_deps, size, halfs_mul_erf_w1, 0.5, d1);
     itt_task_end;
 
@@ -631,7 +631,7 @@ void black_scholes(double* price,
     if (!sync) 
         erf_w2_deps.push_back(w2_event);
 
-    itt_task_begin(handle_malloc_erf_w1);
+    itt_task_begin(handle_malloc_erf_w2);
     double* erf_w2 = sycl::malloc_shared<double>(size, q);
     itt_task_end;
 
