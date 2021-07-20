@@ -871,15 +871,18 @@ double median(std::vector<double> times)
     return times[times.size()/2 - 1] + times[times.size()/2] / 2;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 
-    const size_t SIZE = 20;
+    size_t SIZE = 20;
     const size_t SEED = 7777777;
     const long PL = 10, PH = 50;
     const long SL = 10, SH = 50;
     const long TL = 1, TH = 2;
     const double RISK_FREE = 0.1;
     const double VOLATILITY = 0.2;
+
+    if (argc > 1)
+        SIZE = std::stoi(argv[1]);
     
     sycl::queue q{sycl::gpu_selector{}};
 
