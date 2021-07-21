@@ -90,6 +90,8 @@ __itt_string_handle* handle_wait_Se_mul_d2 = __itt_string_handle_create("wait_Se
 __itt_string_handle* handle_wait_r = __itt_string_handle_create("wait_r");
 __itt_string_handle* handle_wait_r_sub_P = __itt_string_handle_create("wait_r_sub_P");
 __itt_string_handle* handle_wait_r_sub_P_add_Se = __itt_string_handle_create("wait_r_sub_P_add_Se");
+__itt_string_handle* handle_wait_call = __itt_string_handle_create("wait_call");
+__itt_string_handle* handle_wait_put = __itt_string_handle_create("wait_put");
 
 __itt_string_handle* handle_memcpy_r = __itt_string_handle_create("memcpy_r");
 __itt_string_handle* handle_memcpy_r_sub_P_add_Se = __itt_string_handle_create("memcpy_r_sub_P_add_Se");
@@ -236,11 +238,11 @@ sycl::event add(sycl::queue q,
 }
 
 sycl::event add_scalar_to_array(sycl::queue q,
-                    std::vector<sycl::event> &deps,
-                    const size_t size,
-                    double* a,
-                    double b,
-                    double* y)
+                                std::vector<sycl::event> &deps,
+                                const size_t size,
+                                double* a,
+                                double b,
+                                double* y)
 {
     sycl::event event = q.submit([&](sycl::handler &cgh)
     {
@@ -252,10 +254,10 @@ sycl::event add_scalar_to_array(sycl::queue q,
 }
 
 sycl::event erf(sycl::queue q,
-                         std::vector<sycl::event> &deps,
-                         const size_t size,
-                         double* a,
-                         double* y)
+                std::vector<sycl::event> &deps,
+                const size_t size,
+                double* a,
+                double* y)
 {
     sycl::event event = q.submit([&](sycl::handler &cgh) 
     {
@@ -276,6 +278,21 @@ sycl::event exp(sycl::queue q,
     {
         cgh.depends_on(deps);
         cgh.parallel_for(size, [=](sycl::item<1> i) { y[i] = sycl::exp(a[i]);});
+    });
+
+    return event;
+}
+
+sycl::event copy(sycl::queue q,
+                 std::vector<sycl::event> &deps,
+                 const size_t size,
+                 double* a,
+                 double* y)
+{
+    sycl::event event = q.submit([&](sycl::handler &cgh) 
+    {
+        cgh.depends_on(deps);
+        cgh.memcpy(y, a, size*sizeof(double));
     });
 
     return event;
@@ -306,7 +323,6 @@ void black_scholes(double* price,
     sycl::event p_div_s_event = divide(q, p_div_s_deps, size, price, strike, p_div_s);
     itt_task_end;
 
-
     if (sync) 
     {
         itt_task_begin(handle_wait_p_div_s);
@@ -333,8 +349,6 @@ void black_scholes(double* price,
         a_event.wait();
         itt_task_end;
     }
-
-    sycl::free(p_div_s, q);
 
     // ------------ b = t * mr ------------
     std::vector<sycl::event> b_deps;
@@ -376,7 +390,7 @@ void black_scholes(double* price,
     std::vector<sycl::event> c_deps;
     if (!sync)
         c_deps.push_back(z_event);
-    
+
     itt_task_begin(handle_malloc_c);
     double* c = sycl::malloc_shared<double>(size, q);
     itt_task_end;
@@ -411,8 +425,6 @@ void black_scholes(double* price,
         sqrt_z_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(z, q);
 
     //------------ y = 1 / sqrt(z) ------------
     std::vector<sycl::event> y_deps;
@@ -433,8 +445,6 @@ void black_scholes(double* price,
         y_event.wait();
         itt_task_end;
     }
-
-    sycl::free(sqrt_z, q);
 
     //------------ a_sub_b = a - b ------------
     std::vector<sycl::event> a_sub_b_deps;
@@ -458,8 +468,6 @@ void black_scholes(double* price,
         a_sub_b_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(a, q);
 
     //------------ a_sub_b_add_c = a_sub_b + c ------------
     std::vector<sycl::event> a_sub_b_add_c_deps;
@@ -506,8 +514,6 @@ void black_scholes(double* price,
         w1_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(a_sub_b_add_c, q);
 
      //------------ a_sub_b_sub_c = a_sub_b - c ------------
     std::vector<sycl::event> a_sub_b_sub_c_deps;
@@ -532,9 +538,6 @@ void black_scholes(double* price,
         itt_task_end;
     }
 
-    sycl::free(a_sub_b, q);
-    sycl::free(c, q);
-
     //------------ w2 = a_sub_b_sub_c * y ------------
     std::vector<sycl::event> w2_deps;
     if (!sync) 
@@ -556,9 +559,6 @@ void black_scholes(double* price,
         w2_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(a_sub_b_sub_c, q);
-    sycl::free(y, q);
 
     //------------ erf_w1 = erf(w1) ------------
     std::vector<sycl::event> erf_w1_deps;
@@ -579,8 +579,6 @@ void black_scholes(double* price,
         erf_w1_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(w1, q);
 
     //------------ halfs_mul_erf_w1 = 0.5 * erf_w1 ------------
     std::vector<sycl::event> halfs_mul_erf_w1_deps;
@@ -602,8 +600,6 @@ void black_scholes(double* price,
         itt_task_end;
     }
 
-    sycl::free(erf_w1, q);
-
     //------------ d1 = 0.5 + halfs_mul_erf_w1 ------------
     std::vector<sycl::event> d1_deps;
     if (!sync) 
@@ -623,8 +619,6 @@ void black_scholes(double* price,
         d1_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(halfs_mul_erf_w1, q);
 
     //------------ erf_w2 = erf(w2) ------------
     std::vector<sycl::event> erf_w2_deps;
@@ -636,7 +630,7 @@ void black_scholes(double* price,
     itt_task_end;
 
     itt_task_begin(handle_submit_erf_w2);
-    sycl::event erf_w2_event = erf(q, erf_w2_deps, size, w2, erf_w2);
+    sycl::event erf_w2_event = erf(q,erf_w2_deps, size, w2, erf_w2);
     itt_task_end;
 
     if (sync)
@@ -645,8 +639,6 @@ void black_scholes(double* price,
         erf_w2_event.wait();
         itt_task_end;
     }
-
-    sycl::free(w2, q);
 
     //------------ halfs_mul_erf_w2 = 0.5 * erf_w2 ------------
     std::vector<sycl::event> halfs_mul_erf_w2_deps;
@@ -667,8 +659,6 @@ void black_scholes(double* price,
         halfs_mul_erf_w2_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(erf_w2, q);
 
     //------------ d2 = 0.5 + halfs_mul_erf_w2 ------------
     std::vector<sycl::event> d2_deps;
@@ -689,8 +679,6 @@ void black_scholes(double* price,
         d2_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(halfs_mul_erf_w2, q);
 
     //------------ exp_b = exp(b) ------------
     std::vector<sycl::event> exp_b_deps;
@@ -711,8 +699,6 @@ void black_scholes(double* price,
         exp_b_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(b, q);
 
     //------------ Se = exp_b * strike ------------
     std::vector<sycl::event> Se_deps;
@@ -733,9 +719,7 @@ void black_scholes(double* price,
         Se_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(exp_b, q);
-    
+
     //------------ P_mul_d1 = price * d1 ------------
     std::vector<sycl::event> P_mul_d1_deps;
     if (!sync) 
@@ -755,8 +739,6 @@ void black_scholes(double* price,
         P_mul_d1_event.wait();
         itt_task_end;
     }
-
-    sycl::free(d1, q);
 
     //------------ Se_mul_d2 = Se * d2 ------------
     std::vector<sycl::event> Se_mul_d2_deps;
@@ -780,8 +762,6 @@ void black_scholes(double* price,
         Se_mul_d2_event.wait();
         itt_task_end;
     }
-    
-    sycl::free(d2, q);
 
     //------------ r = P_mul_d1 - Se_mul_d2 ------------
     std::vector<sycl::event> r_deps;
@@ -798,18 +778,23 @@ void black_scholes(double* price,
     itt_task_begin(handle_submit_r);
     sycl::event r_event = subtract(q, r_deps, size, P_mul_d1, Se_mul_d2, r);
     itt_task_end;
+    
+    if (sync)
+    {
+        itt_task_begin(handle_wait_r);
+        r_event.wait();
+        itt_task_end;
+    }
 
-    itt_task_begin(handle_wait_r);
-    r_event.wait();
-    itt_task_end;
+    std::vector<sycl::event> call_deps;
+
+    if (!sync)
+        call_deps.push_back(r_event);
 
     itt_task_begin(handle_memcpy_r);
-    memcpy(call, r, size*sizeof(double));
+    sycl::event  call_event = copy(q, call_deps, size, r, call);
     itt_task_end;
 
-    sycl::free(P_mul_d1, q);
-    sycl::free(Se_mul_d2, q);
-    
     //------------ r_sub_P = r - P ------------
     std::vector<sycl::event> r_sub_P_deps;
     if (!sync) 
@@ -845,17 +830,54 @@ void black_scholes(double* price,
     itt_task_begin(handle_submit_r_sub_P_add_Se);
     sycl::event r_sub_P_add_Se_event = add(q, r_sub_P_add_Se_deps, size, r_sub_P, Se, r_sub_P_add_Se);
     itt_task_end;
+    if (sync)
+    {
+        itt_task_begin(handle_wait_r_sub_P_add_Se);
+        r_sub_P_add_Se_event.wait();
+        itt_task_end;
+    }
 
-    itt_task_begin(handle_wait_r_sub_P_add_Se);
-    r_sub_P_add_Se_event.wait();
-    itt_task_end;
+    std::vector<sycl::event> put_deps;
+    if (!sync)
+        put_deps.push_back(r_sub_P_add_Se_event);
 
     itt_task_begin(handle_memcpy_r_sub_P_add_Se);
-    memcpy(put, r_sub_P_add_Se, size*sizeof(double));
+    sycl::event put_event = copy(q, put_deps, size, r_sub_P_add_Se, put);
     itt_task_end;
-    
-    sycl::free(Se, q);
 
+    itt_task_begin(handle_wait_call);
+    call_event.wait();
+    itt_task_end;
+
+    itt_task_begin(handle_wait_put);
+    put_event.wait();
+    itt_task_end;
+
+    sycl::free(p_div_s, q);
+    sycl::free(z, q);
+    sycl::free(sqrt_z, q);
+    sycl::free(a, q);
+    sycl::free(a_sub_b_add_c, q);
+    sycl::free(a_sub_b, q);
+    sycl::free(c, q);
+    sycl::free(a_sub_b_sub_c, q);
+    sycl::free(y, q);
+    sycl::free(w1, q);
+    sycl::free(erf_w1, q);
+    sycl::free(halfs_mul_erf_w1, q);
+    sycl::free(w2, q);
+    sycl::free(erf_w2, q);
+    sycl::free(halfs_mul_erf_w2, q);
+    sycl::free(b, q);
+    sycl::free(exp_b, q);
+    sycl::free(d1, q);
+    sycl::free(d2, q);
+    sycl::free(P_mul_d1, q);
+    sycl::free(Se_mul_d2, q);
+    sycl::free(Se, q);
+    sycl::free(r, q);
+    sycl::free(r_sub_P, q);
+    sycl::free(r_sub_P_add_Se, q);
 }
 
 double random(int a, int b) 
@@ -883,7 +905,7 @@ int main(int argc, char *argv[]) {
 
     if (argc > 1)
         SIZE = std::stoi(argv[1]);
-    
+
     sycl::queue q{sycl::gpu_selector{}};
 
     itt_task_begin(handle_malloc_price);
@@ -921,7 +943,7 @@ int main(int argc, char *argv[]) {
         t[i] =  random(TL, TH);
     itt_task_end;
 
-    //------------ performanse mesure ------------
+    //------------ performance mesure ------------
     std::vector<double> async_times;
     for (int i = 0; i < reprtitions; ++i)
     {
@@ -951,4 +973,6 @@ int main(int argc, char *argv[]) {
     sycl::free(price, q);
     sycl::free(strike, q);
     sycl::free(t, q);
+    sycl::free(call, q);
+    sycl::free(put, q);
 }
