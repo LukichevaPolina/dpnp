@@ -100,6 +100,9 @@ __itt_string_handle* handle_init_price = __itt_string_handle_create("init_price"
 __itt_string_handle* handle_init_strike = __itt_string_handle_create("init_strike");
 __itt_string_handle* handle_init_t = __itt_string_handle_create("init_t");
 
+__itt_string_handle* handle_async_run = __itt_string_handle_create("async_run");
+__itt_string_handle* handle_sync_run = __itt_string_handle_create("sync_run");
+
 #define itt_task_begin(handle) __itt_task_begin(domain_bs, __itt_null, __itt_null, handle)
 #define itt_task_end __itt_task_end(domain_bs)
 
@@ -534,7 +537,7 @@ void black_scholes(double* price,
     if (sync)
     {   
         itt_task_begin(handle_wait_a_sub_b_sub_c);
-        a_sub_b_sub_c_event.wait();
+        a_sub_b_sub_c_event.wait();        
         itt_task_end;
     }
 
@@ -934,7 +937,7 @@ int main(int argc, char *argv[]) {
     itt_task_end;
 
     itt_task_begin(handle_init_strike);
-    for (int i = 0; i < SIZE; i++) 
+    for (int i = 0; i < SIZE; i++)
         strike[i] = random(SL, SH);
     itt_task_end;
 
@@ -948,9 +951,9 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < reprtitions; ++i)
     {
         auto t1 = std::chrono::high_resolution_clock::now();
-
+        itt_task_begin(handle_async_run);
         black_scholes(price, strike, t, RISK_FREE, VOLATILITY, call, put, SIZE, q);
-
+        itt_task_end;
         auto t2 = std::chrono::high_resolution_clock::now();
         async_times.push_back(std::chrono::duration_cast<std::chrono::duration<double>>( t2 - t1 ).count());
     }
@@ -959,9 +962,9 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < reprtitions; ++i) 
     {
         auto t1 = std::chrono::high_resolution_clock::now();
-
+        itt_task_begin(handle_sync_run);
         black_scholes(price, strike, t, RISK_FREE, VOLATILITY, call, put, SIZE, q, true);
-
+        itt_task_end;
         auto t2 = std::chrono::high_resolution_clock::now();
         sync_times.push_back(std::chrono::duration_cast<std::chrono::duration<double>>( t2 - t1 ).count());
     }
