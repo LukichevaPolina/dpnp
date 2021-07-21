@@ -534,7 +534,7 @@ void black_scholes(double* price,
     if (sync)
     {   
         itt_task_begin(handle_wait_a_sub_b_sub_c);
-        a_sub_b_sub_c_event.wait()
+        a_sub_b_sub_c_event.wait();
         itt_task_end;
     }
 
