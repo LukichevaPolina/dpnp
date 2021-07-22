@@ -39,6 +39,13 @@ __itt_string_handle* handle_malloc_r = __itt_string_handle_create("malloc_r");
 __itt_string_handle* handle_malloc_r_sub_P = __itt_string_handle_create("malloc_r_sub_P");
 __itt_string_handle* handle_malloc_r_sub_P_add_Se = __itt_string_handle_create("malloc_r_sub_P_add_Se");
 
+__itt_string_handle* handle_prefetch_p_div_s = __itt_string_handle_create("prefetch_p_div_s");
+__itt_string_handle* handle_prefetch_a = __itt_string_handle_create("prefetch_a");
+__itt_string_handle* handle_prefetch_b = __itt_string_handle_create("prefetch_b");
+__itt_string_handle* handle_prefetch_z = __itt_string_handle_create("prefetch_z");
+__itt_string_handle* handle_prefetch_c = __itt_string_handle_create("prefetch_c");
+__itt_string_handle* handle_prefetch_sqrt_z = __itt_string_handle_create("prefetch_sqrt_z");
+
 __itt_string_handle* handle_submit_p_div_s = __itt_string_handle_create("submit_p_div_s");
 __itt_string_handle* handle_submit_a = __itt_string_handle_create("submit_a");
 __itt_string_handle* handle_submit_b = __itt_string_handle_create("submit_b");
@@ -102,6 +109,7 @@ __itt_string_handle* handle_init_t = __itt_string_handle_create("init_t");
 
 __itt_string_handle* handle_async_run = __itt_string_handle_create("async_run");
 __itt_string_handle* handle_sync_run = __itt_string_handle_create("sync_run");
+
 
 #define itt_task_begin(handle) __itt_task_begin(domain_bs, __itt_null, __itt_null, handle)
 #define itt_task_end __itt_task_end(domain_bs)
@@ -316,11 +324,18 @@ void black_scholes(double* price,
     double vol_vol_two = vol * vol * 2;
 
     // ------------ p_div_s = price / strike ----------
-    std::vector<sycl::event> p_div_s_deps;
 
     itt_task_begin(handle_malloc_p_div_s);
     double* p_div_s = sycl::malloc_shared<double>(size, q);
     itt_task_end;
+
+    std::vector<sycl::event> p_div_s_deps;
+    if (!sync)
+    {
+        itt_task_begin(handle_prefetch_p_div_s);
+        p_div_s_deps.push_back(q.prefetch(p_div_s, size * sizeof(double)));
+        itt_task_end;
+    }
 
     itt_task_begin(handle_submit_p_div_s);
     sycl::event p_div_s_event = divide(q, p_div_s_deps, size, price, strike, p_div_s);
@@ -334,13 +349,18 @@ void black_scholes(double* price,
     }
 
     // ------------ a = log(p_div_s) ------------
-    std::vector<sycl::event> a_deps;
-    if (!sync) 
-        a_deps.push_back(p_div_s_event);
-
     itt_task_begin(handle_malloc_a);
     double* a = sycl::malloc_shared<double>(size, q);
     itt_task_end;
+
+    std::vector<sycl::event> a_deps;
+    if (!sync) 
+    {
+        a_deps.push_back(p_div_s_event);
+        itt_task_begin(handle_prefetch_a);
+        a_deps.push_back(q.prefetch(a, size * sizeof(double)));
+        itt_task_end;
+    }
 
     itt_task_begin(handle_submit_a);
     sycl::event a_event = log(q, a_deps, size, p_div_s, a);
@@ -354,11 +374,17 @@ void black_scholes(double* price,
     }
 
     // ------------ b = t * mr ------------
-    std::vector<sycl::event> b_deps;
-
     itt_task_begin(handle_malloc_b);
     double* b = sycl::malloc_shared<double>(size, q);
     itt_task_end;
+
+    std::vector<sycl::event> b_deps;
+    if(!sync)
+    {
+        itt_task_begin(handle_prefetch_b);
+        b_deps.push_back(q.prefetch(b, size * sizeof(double)));
+        itt_task_end;
+    }
 
     itt_task_begin(handle_submit_b);
     sycl::event b_event = multiply_array_by_scalar(q, b_deps, size, t, mr, b);
@@ -372,11 +398,17 @@ void black_scholes(double* price,
     }
 
     //------------ z = t * vol_vol_two ------------
-    std::vector<sycl::event> z_deps;
-
     itt_task_begin(handle_malloc_z);
     double* z = sycl::malloc_shared<double>(size, q);
     itt_task_end;
+
+    std::vector<sycl::event> z_deps;
+    if (!sync) 
+    {
+        itt_task_begin(handle_prefetch_z);
+        z_deps.push_back(q.prefetch(z, size * sizeof(double)));
+        itt_task_end;
+    }
 
     itt_task_begin(handle_submit_z);
     sycl::event z_event = multiply_array_by_scalar(q, z_deps, size, t, vol_vol_two, z);
@@ -390,13 +422,18 @@ void black_scholes(double* price,
     }
 
     //------------ c = 0.25 * z ------------
-    std::vector<sycl::event> c_deps;
-    if (!sync)
-        c_deps.push_back(z_event);
-
     itt_task_begin(handle_malloc_c);
     double* c = sycl::malloc_shared<double>(size, q);
     itt_task_end;
+
+    std::vector<sycl::event> c_deps;
+    if (!sync)
+    {
+        c_deps.push_back(z_event);
+        itt_task_begin(handle_prefetch_c);
+        c_deps.push_back(q.prefetch(c, size * sizeof(double)));
+        itt_task_end;
+    }
 
     itt_task_begin(handle_submit_c);
     sycl::event c_event = multiply_array_by_scalar(q, c_deps, size, z, 0.25, c);
@@ -410,14 +447,19 @@ void black_scholes(double* price,
     }
 
     //------------ sqrt_z = sqrt(z) ------------
-    std::vector<sycl::event> sqrt_z_deps;
-    if (!sync)
-        sqrt_z_deps.push_back(z_event);
-
     itt_task_begin(handle_malloc_sqrt_z);
     double* sqrt_z = sycl::malloc_shared<double>(size, q);
     itt_task_end;
 
+    std::vector<sycl::event> sqrt_z_deps;
+    if (!sync)
+    {
+        sqrt_z_deps.push_back(z_event);
+        itt_task_begin(handle_prefetch_sqrt_z);
+        sqrt_z_deps.push_back(q.prefetch(sqrt_z, size * sizeof(double)));
+        itt_task_end;
+    }
+    
     itt_task_begin(handle_submit_sqrt_z);
     sycl::event sqrt_z_event = sqrt(q, sqrt_z_deps, size, z, sqrt_z);
     itt_task_end;
@@ -968,7 +1010,10 @@ int main(int argc, char *argv[]) {
         auto t2 = std::chrono::high_resolution_clock::now();
         sync_times.push_back(std::chrono::duration_cast<std::chrono::duration<double>>( t2 - t1 ).count());
     }
+    itt_task_begin(handle_init_t);
 
+    itt_task_end;
+    std::cout << std::endl;
     std::cout << "Async time: " << median(async_times) << " s." << std::endl;
     std::cout << "Sync time: " << median(sync_times) << " s." << std::endl;
     std::cout << "Speedup: " << median(sync_times) / median(async_times) << "x" << std::endl;
