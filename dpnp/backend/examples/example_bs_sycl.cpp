@@ -115,8 +115,6 @@ __itt_string_handle* handle_sync_run = __itt_string_handle_create("sync_run");
 
 #endif
 
-const int reprtitions = 15;
-
 sycl::event divide(sycl::queue q,
                    std::vector<sycl::event> &deps,
                    const size_t size,
@@ -906,16 +904,20 @@ double median(std::vector<double> times)
 
 int main(int argc, char *argv[]) {
 
+    int repetitions = 1;
+    if (argc > 2)
+        repetitions = std::stoi(argv[2]);
+
     size_t SIZE = 20;
+    if (argc > 1)
+        SIZE = std::stoi(argv[1]);
+
     const size_t SEED = 7777777;
     const long PL = 10, PH = 50;
     const long SL = 10, SH = 50;
     const long TL = 1, TH = 2;
     const double RISK_FREE = 0.1;
     const double VOLATILITY = 0.2;
-
-    if (argc > 1)
-        SIZE = std::stoi(argv[1]);
 
     sycl::queue q{sycl::gpu_selector{}};
 
@@ -961,24 +963,32 @@ int main(int argc, char *argv[]) {
     itt_task_end;
 
     //------------ performance mesure ------------
-    auto t1 = std::chrono::high_resolution_clock::now();
-    itt_task_begin(handle_async_run);
-    black_scholes(price, strike, t, RISK_FREE, VOLATILITY, call, put, SIZE, q);
-    itt_task_end;
-    auto t2 = std::chrono::high_resolution_clock::now();
-    double async_time = std::chrono::duration_cast<std::chrono::duration<double>>( t2 - t1 ).count();
+    std::vector<double> async_times;
+    for (int i = 0; i < repetitions; ++i) 
+    {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        itt_task_begin(handle_async_run);
+        black_scholes(price, strike, t, RISK_FREE, VOLATILITY, call, put, SIZE, q);
+        itt_task_end;
+        auto t2 = std::chrono::high_resolution_clock::now();
+        async_times.push_back(std::chrono::duration_cast<std::chrono::duration<double>>( t2 - t1 ).count());
+    }
 
-    t1 = std::chrono::high_resolution_clock::now();
-    itt_task_begin(handle_sync_run);
-    black_scholes(price, strike, t, RISK_FREE, VOLATILITY, call, put, SIZE, q, true);
-    itt_task_end;
-    t2 = std::chrono::high_resolution_clock::now();
-    double sync_time = std::chrono::duration_cast<std::chrono::duration<double>>( t2 - t1 ).count();
+    std::vector<double> sync_times;
+    for (int i = 0; i < repetitions; ++i)  
+    {   
+        auto t1 = std::chrono::high_resolution_clock::now();
+        itt_task_begin(handle_sync_run);
+        black_scholes(price, strike, t, RISK_FREE, VOLATILITY, call, put, SIZE, q, true);
+        itt_task_end;
+        auto t2 = std::chrono::high_resolution_clock::now();
+        sync_times.push_back(std::chrono::duration_cast<std::chrono::duration<double>>( t2 - t1 ).count());
+    }
 
     std::cout << std::endl;
-    std::cout << "Async time: " << async_time << " s." << std::endl;
-    std::cout << "Sync time: " << sync_time << " s." << std::endl;
-    std::cout << "Speedup: " << sync_time / async_time << "x" << std::endl;
+    std::cout << "Async time: " << median(async_times) << " s." << std::endl;
+    std::cout << "Sync time: " <<  median(sync_times) << " s." << std::endl;
+    std::cout << "Speedup: " <<  median(sync_times) /  median(async_times) << "x" << std::endl;
 
     sycl::free(price, q);
     sycl::free(strike, q);
