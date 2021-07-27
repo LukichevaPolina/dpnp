@@ -45,6 +45,8 @@
 #include "dpnp_iface_fft.hpp"
 #include "dpnp_iface_random.hpp"
 
+#include "dpnp_async.hpp"
+
 #ifdef _WIN32
 #define INP_DLLEXPORT __declspec(dllexport)
 #else
@@ -186,8 +188,24 @@ INP_DLLEXPORT void dpnp_full_like_c(void* array_in, void* result, size_t size);
  * @param [in]  size      Number of elements in input arrays.
  */
 template <typename _DataType>
-INP_DLLEXPORT void
+INP_DLLEXPORT Deps*
     dpnp_matmul_c(void* array1, void* array2, void* result1, size_t size_m, size_t size_n, size_t size_k);
+
+/**
+ * @ingroup BACKEND_API
+ * @brief Matrix multiplication.
+ *
+ * Matrix multiplication procedure. Works with 2-D matrices
+ *
+ * @param [in]  array1    Input array.
+ * @param [in]  array2    Input array.
+ * @param [out] result1   Output array.
+ * @param [in]  size      Number of elements in input arrays.
+ //////////////////////////add/////////////////////////
+ */
+template <typename _DataType>
+INP_DLLEXPORT Deps*
+    dpnp_matmul_c(void* array1, void* array2, void* result1, size_t size_m, size_t size_n, size_t size_k, Deps* deps_in);
 
 /**
  * @ingroup BACKEND_API

@@ -276,7 +276,7 @@ cpdef dparray dpnp_matmul(dpnp_descriptor in_array1, dpnp_descriptor in_array2, 
 
     cdef fptr_blas_gemm_2in_1out_t func = <fptr_blas_gemm_2in_1out_t > kernel_data.ptr
     # call FPTR function
-    func(in_array1.get_data(), in_array2.get_data(), result.get_data(), size_m, size_n, size_k)
+    func(in_array1.get_data(), in_array2.get_data(), result.get_data(), size_m, size_n, size_k).wait()
 
     return result
 
