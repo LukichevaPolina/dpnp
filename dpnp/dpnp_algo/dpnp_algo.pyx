@@ -41,7 +41,6 @@ cimport cpython
 cimport dpnp.dpnp_utils as utils
 cimport numpy
 
-
 __all__ = [
     "dpnp_arange",
     "dpnp_array",

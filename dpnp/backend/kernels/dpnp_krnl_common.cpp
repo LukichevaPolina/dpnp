@@ -32,6 +32,9 @@
 #include "dpnp_utils.hpp"
 #include "queue_sycl.hpp"
 
+#include "dpnp_async.hpp"
+#include "dpnp_async_pimpl.hpp"
+
 namespace mkl_blas = oneapi::mkl::blas;
 namespace mkl_lapack = oneapi::mkl::lapack;
 
@@ -302,7 +305,7 @@ template <typename _KernelNameSpecialization>
 class dpnp_matmul_c_kernel;
 
 template <typename _DataType>
-void dpnp_matmul_c(void* array1_in, void* array2_in, void* result1, size_t size_m, size_t size_n, size_t size_k)
+Deps* dpnp_matmul_c(void* array1_in, void* array2_in, void* result1, size_t size_m, size_t size_n, size_t size_k, Deps* deps_in)
 {
     cl::sycl::event event;
     _DataType* array_1 = reinterpret_cast<_DataType*>(array1_in);
@@ -311,7 +314,7 @@ void dpnp_matmul_c(void* array1_in, void* array2_in, void* result1, size_t size_
 
     if (!size_m || !size_n || !size_k)
     {
-        return;
+        return new Deps();
     }
 
     if constexpr (std::is_same<_DataType, double>::value || std::is_same<_DataType, float>::value)
@@ -334,7 +337,8 @@ void dpnp_matmul_c(void* array1_in, void* array2_in, void* result1, size_t size_
                                lda,
                                _DataType(0),
                                result,
-                               ldc);
+                               ldc,
+                               deps_in->get_pImpl()->get());
     }
     else
     {
@@ -366,13 +370,32 @@ void dpnp_matmul_c(void* array1_in, void* array2_in, void* result1, size_t size_
         };
 
         auto kernel_func = [&](cl::sycl::handler& cgh) {
+            cgh.depends_on(deps_in->get_pImpl()->get());
             cgh.parallel_for<class dpnp_matmul_c_kernel<_DataType>>(gws, kernel_parallel_for_func);
         };
 
         event = DPNP_QUEUE.submit(kernel_func);
     }
-    event.wait();
+
+    Deps* deps_out = new Deps();
+    deps_out->get_pImpl()->add(event);
+
+    return deps_out;
 }
+
+template Deps* dpnp_matmul_c<int>(void*, void*, void*, size_t, size_t, size_t, Deps*);
+template Deps* dpnp_matmul_c<long>(void*, void*, void*, size_t, size_t, size_t, Deps*);
+template Deps* dpnp_matmul_c<float>(void*, void*, void*, size_t, size_t, size_t, Deps*);
+template Deps* dpnp_matmul_c<double>(void*, void*, void*, size_t, size_t, size_t, Deps*);
+
+template <typename _DataType>
+Deps* dpnp_matmul_c(void* array1_in, void* array2_in, void* result1, size_t size_m, size_t size_n, size_t size_k)
+{
+    return dpnp_matmul_c<_DataType>(array1_in, array2_in, result1, size_m, size_n, size_k, new Deps());
+}
+
+template <typename _DataType>
+Deps* (*dpnp_matmul_default_c)(void*, void*, void*, size_t, size_t, size_t) = dpnp_matmul_c<_DataType>;
 
 void func_map_init_linalg(func_map_t& fmap)
 {
@@ -437,10 +460,10 @@ void func_map_init_linalg(func_map_t& fmap)
     fmap[DPNPFuncName::DPNP_FN_INITVAL][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_initval_c<double>};
     fmap[DPNPFuncName::DPNP_FN_INITVAL][eft_C128][eft_C128] = {eft_C128, (void*)dpnp_initval_c<std::complex<double>>};
 
-    fmap[DPNPFuncName::DPNP_FN_MATMUL][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_matmul_c<int>};
-    fmap[DPNPFuncName::DPNP_FN_MATMUL][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_matmul_c<long>};
-    fmap[DPNPFuncName::DPNP_FN_MATMUL][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_matmul_c<float>};
-    fmap[DPNPFuncName::DPNP_FN_MATMUL][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_matmul_c<double>};
+    fmap[DPNPFuncName::DPNP_FN_MATMUL][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_matmul_default_c<int>};
+    fmap[DPNPFuncName::DPNP_FN_MATMUL][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_matmul_default_c<long>};
+    fmap[DPNPFuncName::DPNP_FN_MATMUL][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_matmul_default_c<float>};
+    fmap[DPNPFuncName::DPNP_FN_MATMUL][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_matmul_default_c<double>};
 
     return;
 }
