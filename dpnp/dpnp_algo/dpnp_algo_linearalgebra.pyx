@@ -93,7 +93,7 @@ cpdef dparray dpnp_dot(dpnp_descriptor in_array1, dpnp_descriptor in_array2):
     cdef fptr_2in_1out_t func = <fptr_2in_1out_t > kernel_data.ptr
     # call FPTR function
     func(result.get_data(), in_array1.get_data(), in_array1.size, shape1.data(), shape1.size(),
-         in_array2.get_data(), in_array2.size, shape2.data(), shape2.size(), NULL)
+         in_array2.get_data(), in_array2.size, shape2.data(), shape2.size(), NULL).wait()
 
     return result
 

@@ -45,6 +45,8 @@
 #include "dpnp_iface_fft.hpp"
 #include "dpnp_iface_random.hpp"
 
+#include "dpnp_async.hpp"
+
 #ifdef _WIN32
 #define INP_DLLEXPORT __declspec(dllexport)
 #else
@@ -856,7 +858,7 @@ INP_DLLEXPORT void dpnp_invert_c(void* array1_in, void* result, size_t size);
 
 #define MACRO_2ARG_3TYPES_OP(__name__, __operation1__, __operation2__)                                                 \
     template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>                         \
-    INP_DLLEXPORT void __name__(void* result_out,                                                                      \
+    INP_DLLEXPORT Deps* __name__(void* result_out,                                                                     \
                                 const void* input1_in,                                                                 \
                                 const size_t input1_size,                                                              \
                                 const size_t* input1_shape,                                                            \
@@ -866,6 +868,20 @@ INP_DLLEXPORT void dpnp_invert_c(void* array1_in, void* result, size_t size);
                                 const size_t* input2_shape,                                                            \
                                 const size_t input2_shape_ndim,                                                        \
                                 const size_t* where);
+
+#define MACRO_2ARG_3TYPES_OP_ASYNC(__name__, __operation1__, __operation2__)                                           \
+    template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>                         \
+    INP_DLLEXPORT Deps* __name__(void* result_out,                                                                     \
+                                const void* input1_in,                                                                 \
+                                const size_t input1_size,                                                              \
+                                const size_t* input1_shape,                                                            \
+                                const size_t input1_shape_ndim,                                                        \
+                                const void* input2_in,                                                                 \
+                                const size_t input2_size,                                                              \
+                                const size_t* input2_shape,                                                            \
+                                const size_t input2_shape_ndim,                                                        \
+                                const size_t* where,                                                                   \
+                                Deps* deps);                                                                          
 
 #include <dpnp_gen_2arg_3type_tbl.hpp>
 

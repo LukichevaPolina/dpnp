@@ -290,6 +290,6 @@ cdef dparray call_fptr_2in_1out(DPNPFuncName fptr_name, utils.dpnp_descriptor x1
     """ Call FPTR function """
     cdef fptr_2in_1out_t func = <fptr_2in_1out_t > kernel_data.ptr
     func(result.get_data(), x1_obj.get_data(), x1_obj.size, x1_shape.data(), x1_shape.size(),
-         x2_obj.get_data(), x2_obj.size, x2_shape.data(), x2_shape.size(), NULL)
+         x2_obj.get_data(), x2_obj.size, x2_shape.data(), x2_shape.size(), NULL).wait()
 
     return result
