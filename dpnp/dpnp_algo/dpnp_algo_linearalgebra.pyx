@@ -90,10 +90,10 @@ cpdef dparray dpnp_dot(dpnp_descriptor in_array1, dpnp_descriptor in_array2):
     # ceate result array with type given by FPTR data
     cdef dparray result = dparray((1,), dtype=result_type)
 
-    cdef fptr_2in_1out_t func = <fptr_2in_1out_t > kernel_data.ptr
+    cdef fptr_dot_t func = <fptr_dot_t > kernel_data.ptr
     # call FPTR function
     func(result.get_data(), in_array1.get_data(), in_array1.size, shape1.data(), shape1.size(),
-         in_array2.get_data(), in_array2.size, shape2.data(), shape2.size(), NULL).wait()
+         in_array2.get_data(), in_array2.size, shape2.data(), shape2.size(), NULL)
 
     return result
 

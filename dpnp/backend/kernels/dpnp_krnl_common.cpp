@@ -32,6 +32,9 @@
 #include "dpnp_utils.hpp"
 #include "queue_sycl.hpp"
 
+#include "dpnp_async.hpp"
+#include "dpnp_async_pimpl.hpp"
+
 namespace mkl_blas = oneapi::mkl::blas;
 namespace mkl_lapack = oneapi::mkl::lapack;
 

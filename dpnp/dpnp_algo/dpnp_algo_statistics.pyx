@@ -105,10 +105,10 @@ cpdef dparray dpnp_correlate(utils.dpnp_descriptor x1, utils.dpnp_descriptor x2)
 
     cdef dparray result = dparray(1, dtype=result_type)
 
-    cdef fptr_2in_1out_t func = <fptr_2in_1out_t > kernel_data.ptr
+    cdef fptr_correlate_t func = <fptr_correlate_t > kernel_data.ptr
 
     func(result.get_data(), x1.get_data(), x1.size, x1_shape.data(), x1_shape.size(),
-         x2.get_data(), x2.size, x2_shape.data(), x2_shape.size(), NULL).wait()
+         x2.get_data(), x2.size, x2_shape.data(), x2_shape.size(), NULL)
 
     return result
 

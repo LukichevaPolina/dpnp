@@ -230,12 +230,15 @@ ctypedef void(*fptr_1out_t)(void *, size_t)
 ctypedef void(*fptr_1in_1out_t)(void * , void * , size_t)
 ctypedef (Deps*)(*fptr_2in_1out_t)(void *, const void * , const size_t, const long * , const size_t,
                                 const void * , const size_t, const long * , const size_t, const long * )
+ctypedef void(*fptr_dot_t)(void *, const void * , const size_t, const long * , const size_t,
+                                const void * , const size_t, const long * , const size_t, const long * )
+ctypedef void(*fptr_correlate_t)(void *, const void * , const size_t, const long * , const size_t,
+                                const void * , const size_t, const long * , const size_t, const long * )
 ctypedef void(*fptr_blas_gemm_2in_1out_t)(void * , void * , void * , size_t, size_t, size_t)
 ctypedef void(*dpnp_reduction_c_t)(void * , const void * , const size_t*, const size_t, const long*, const size_t, const void * , const long*)
 
 cpdef dparray dpnp_astype(dparray array1, dtype_target)
 cpdef dparray dpnp_flatten(dparray array1)
-
 
 """
 Internal functions

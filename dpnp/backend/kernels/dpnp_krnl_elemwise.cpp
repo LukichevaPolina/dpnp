@@ -445,7 +445,7 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
                    const size_t input1_shape_ndim,                                                                     \
                    const void* input2_in,                                                                              \
                    const size_t input2_size,                                                                           \
-                  const size_t* input2_shape,                                                                          \
+                   const size_t* input2_shape,                                                                          \
                    const size_t input2_shape_ndim,                                                                     \
                    const size_t* where)                                                                                \
     {                                                                                                                  \
