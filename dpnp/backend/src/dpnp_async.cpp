@@ -15,9 +15,5 @@ void Deps::wait()
 {
     pImpl->wait();
 }
-Deps::Deps()
-    : pImpl(std::make_unique<Impl>())
-{
-}
+Deps::Deps() : pImpl(std::make_unique<Impl>()) {}
 Deps::~Deps() {}
-
