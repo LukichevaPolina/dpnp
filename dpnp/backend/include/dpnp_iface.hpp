@@ -271,8 +271,6 @@ INP_DLLEXPORT void dpnp_dot_c(void* result_out,
  * @param [in]  input2_shape        Shape of first input array.
  * @param [in]  input2_shape_ndim   Number of second array dimensions.
  * @param [in]  where               Mask array.
- * @param [out] result1             Output array.
- * @param [in]  size                Number of elements in input arrays.
  * @param [in]  deps                Dependent events.
  */
 template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
@@ -302,8 +300,6 @@ INP_DLLEXPORT Deps* dpnp_cross_c(void* result_out,
  * @param [in]  input2_shape        Shape of first input array.
  * @param [in]  input2_shape_ndim   Number of second array dimensions.
  * @param [in]  where               Mask array.
- * @param [out] result1             Output array.
- * @param [in]  size                Number of elements in input arrays.
  */
 
 template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
@@ -1031,8 +1027,6 @@ INP_DLLEXPORT void dpnp_fill_diagonal_c(void* array1_in, void* val, size_t* shap
  * @param [in]  input2_shape        Shape of first input array.
  * @param [in]  input2_shape_ndim   Number of second array dimensions.
  * @param [in]  where               Mask array.
- * @param [out] result1             Output array.
- * @param [in]  size                Number of elements in input arrays.
  * @param [in]  deps                Dependent events.
  */
 template <typename _DataType_input1, typename _DataType_input2, typename _DataType_output>
@@ -1062,8 +1056,6 @@ INP_DLLEXPORT Deps* dpnp_floor_divide_c(void* result_out,
  * @param [in]  input2_shape        Shape of first input array.
  * @param [in]  input2_shape_ndim   Number of second array dimensions.
  * @param [in]  where               Mask array.
- * @param [out] result1             Output array.
- * @param [in]  size                Number of elements in input arrays.
  */
 template <typename _DataType_input1, typename _DataType_input2, typename _DataType_output>
 INP_DLLEXPORT Deps* dpnp_floor_divide_c(void* result_out,
@@ -1122,8 +1114,6 @@ INP_DLLEXPORT void dpnp_ones_like_c(void* result, size_t size);
  * @param [in]  input2_shape        Shape of first input array.
  * @param [in]  input2_shape_ndim   Number of second array dimensions.
  * @param [in]  where               Mask array.
- * @param [out] result1             Output array.
- * @param [in]  size                Number of elements in input arrays.
  * @param [in]  deps                Dependent events.
  */
 template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
@@ -1153,8 +1143,6 @@ INP_DLLEXPORT Deps* dpnp_remainder_c(void* result_out,
  * @param [in]  input2_shape        Shape of first input array.
  * @param [in]  input2_shape_ndim   Number of second array dimensions.
  * @param [in]  where               Mask array.
- * @param [out] result1             Output array.
- * @param [in]  size                Number of elements in input arrays.
  */
 template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
 INP_DLLEXPORT Deps* dpnp_remainder_c(void* result_out,

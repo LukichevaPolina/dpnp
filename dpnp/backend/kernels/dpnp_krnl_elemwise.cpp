@@ -679,7 +679,7 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
     template <typename _KernelNameSpecialization1,                                                                     \
               typename _KernelNameSpecialization2,                                                                     \
               typename _KernelNameSpecialization3>                                                                     \
-    class __name__##_async_kernel;                                                                                     \
+    class __name__##_kernel;                                                                                     \
                                                                                                                        \
     template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>                         \
     Deps* __name__(void* result_out,                                                                                   \
@@ -734,7 +734,7 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
         };                                                                                                             \
         auto kernel_func = [&](cl::sycl::handler& cgh) {                                                               \
             cgh.depends_on(deps_in->get_pImpl()->get());                                                               \
-            cgh.parallel_for<class __name__##_async_kernel<_DataType_output, _DataType_input1, _DataType_input2>>(     \
+            cgh.parallel_for<class __name__##_kernel<_DataType_output, _DataType_input1, _DataType_input2>>(     \
                 gws, kernel_parallel_for_func);                                                                        \
         };                                                                                                             \
                                                                                                                        \
