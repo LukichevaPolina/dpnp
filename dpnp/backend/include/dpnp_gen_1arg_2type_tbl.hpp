@@ -51,7 +51,7 @@
     /** @param[out] result1  Output array.                                                                           */ \
     /** @param[in]  size     Number of elements in the input array.                                                  */ \
     template <typename _DataType_input, typename _DataType_output>                                                      \
-    void __name__(void* array1, void* result1, size_t size);
+    Deps* __name__(void* array1, void* result1, size_t size);
 
 #endif
 

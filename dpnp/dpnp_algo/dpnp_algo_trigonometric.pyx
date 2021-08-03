@@ -163,7 +163,7 @@ cpdef dparray dpnp_sin(utils.dpnp_descriptor x1, dparray out=None):
 
     cdef fptr_1in_1out_t func = <fptr_1in_1out_t > kernel_data.ptr
 
-    func(x1.get_data(), result.get_data(), x1.size)
+    func(x1.get_data(), result.get_data(), x1.size).wait()
 
     return result
 

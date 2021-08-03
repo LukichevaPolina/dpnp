@@ -108,7 +108,7 @@ cpdef dparray dpnp_full(result_shape, value_in, result_dtype):
     # Create result array with type given by FPTR data
     cdef dparray result = dparray(result_shape, dtype=result_type)
 
-    cdef fptr_1in_1out_t func = <fptr_1in_1out_t > kernel_data.ptr
+    cdef fptr_full_t func = <fptr_full_t > kernel_data.ptr
     # Call FPTR function
     func(array_in.get_data(), result.get_data(), result.size)
 
@@ -130,7 +130,7 @@ cpdef dparray dpnp_full_like(result_shape, value_in, result_dtype):
     # Create result array with type given by FPTR data
     cdef dparray result = dparray(result_shape, dtype=result_type)
 
-    cdef fptr_1in_1out_t func = <fptr_1in_1out_t > kernel_data.ptr
+    cdef fptr_full_t func = <fptr_full_t > kernel_data.ptr
     # Call FPTR function
     func(array_in.get_data(), result.get_data(), result.size)
 

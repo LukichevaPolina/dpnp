@@ -25,19 +25,20 @@
 
 #include <iostream>
 
+#include "dpnp_async.hpp"
+#include "dpnp_async_pimpl.hpp"
 #include "dpnp_fptr.hpp"
 #include "dpnp_iface.hpp"
 #include "queue_sycl.hpp"
-#include "dpnp_async.hpp"
-#include "dpnp_async_pimpl.hpp"
 
 template <typename _KernelNameSpecialization>
 class dpnp_invert_c_kernel;
 
 template <typename _DataType>
-void dpnp_invert_c(void* array1_in, void* result1, size_t size)
+Deps* dpnp_invert_c(void* array1_in, void* result1, size_t size, Deps* deps_in)
 {
     cl::sycl::event event;
+    Deps* deps_out = new Deps();
     _DataType* array1 = reinterpret_cast<_DataType*>(array1_in);
     _DataType* result = reinterpret_cast<_DataType*>(result1);
 
@@ -51,23 +52,36 @@ void dpnp_invert_c(void* array1_in, void* result1, size_t size)
     };
 
     auto kernel_func = [&](cl::sycl::handler& cgh) {
+        cgh.depends_on(deps_in->get_pImpl()->get());
         cgh.parallel_for<class dpnp_invert_c_kernel<_DataType>>(gws, kernel_parallel_for_func);
     };
 
     event = DPNP_QUEUE.submit(kernel_func);
-
-    event.wait();
+    deps_out->get_pImpl()->add(event);
+    return deps_out;
 }
+
+template Deps* dpnp_invert_c<int>(void*, void*, size_t, Deps*);
+template Deps* dpnp_invert_c<long>(void*, void*, size_t, Deps*);
+
+template <typename _DataType>
+Deps* dpnp_invert_c(void* array1_in, void* result1, size_t size)
+{
+    return dpnp_invert_c<_DataType>(array1_in, result1, size, new Deps());
+}
+
+template <typename _DataType>
+Deps* (*dpnp_invert_default_c)(void*, void*, size_t) = dpnp_invert_c<_DataType>;
 
 static void func_map_init_bitwise_1arg_1type(func_map_t& fmap)
 {
-    fmap[DPNPFuncName::DPNP_FN_INVERT][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_invert_c<int>};
-    fmap[DPNPFuncName::DPNP_FN_INVERT][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_invert_c<long>};
+    fmap[DPNPFuncName::DPNP_FN_INVERT][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_invert_default_c<int>};
+    fmap[DPNPFuncName::DPNP_FN_INVERT][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_invert_default_c<long>};
 
     return;
 }
 
-#define MACRO_2ARG_1TYPE_OP_ASYNC(__name__, __operation__)                                                             \
+#define MACRO_2ARG_1TYPE_ASYNC_OP(__name__, __operation__)                                                             \
     template <typename _KernelNameSpecialization>                                                                      \
     class __name__##_kernel;                                                                                           \
                                                                                                                        \
@@ -118,7 +132,7 @@ static void func_map_init_bitwise_1arg_1type(func_map_t& fmap)
                                                                                                                        \
         event = DPNP_QUEUE.submit(kernel_func);                                                                        \
                                                                                                                        \
-        deps_out->get_pImpl()->add(event);                                                                              \
+        deps_out->get_pImpl()->add(event);                                                                             \
         return deps_out;                                                                                               \
     }
 
@@ -135,61 +149,196 @@ static void func_map_init_bitwise_1arg_1type(func_map_t& fmap)
                    const size_t input2_shape_ndim,                                                                     \
                    const size_t* where)                                                                                \
     {                                                                                                                  \
-        return __name__<_DataType>(result_out, input1_in, input1_size, input1_shape, input1_shape_ndim, input2_in,     \
-                                input2_size, input2_shape, input2_shape_ndim, where, new Deps());                      \
+        return __name__<_DataType>(result_out,                                                                         \
+                                   input1_in,                                                                          \
+                                   input1_size,                                                                        \
+                                   input1_shape,                                                                       \
+                                   input1_shape_ndim,                                                                  \
+                                   input2_in,                                                                          \
+                                   input2_size,                                                                        \
+                                   input2_shape,                                                                       \
+                                   input2_shape_ndim,                                                                  \
+                                   where,                                                                              \
+                                   new Deps());                                                                        \
     }
 
+#include <dpnp_gen_2arg_1type_async_tbl.hpp>
 #include <dpnp_gen_2arg_1type_tbl.hpp>
 
-template Deps* dpnp_bitwise_and_c<int>(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                       const size_t, const size_t*, const size_t, const size_t*, Deps*);
-template Deps* dpnp_bitwise_and_c<long>(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                        const size_t, const size_t*, const size_t, const size_t*, Deps*);
+template Deps* dpnp_bitwise_and_c<int>(void*,
+                                       const void*,
+                                       const size_t,
+                                       const size_t*,
+                                       const size_t,
+                                       const void*,
+                                       const size_t,
+                                       const size_t*,
+                                       const size_t,
+                                       const size_t*,
+                                       Deps*);
+template Deps* dpnp_bitwise_and_c<long>(void*,
+                                        const void*,
+                                        const size_t,
+                                        const size_t*,
+                                        const size_t,
+                                        const void*,
+                                        const size_t,
+                                        const size_t*,
+                                        const size_t,
+                                        const size_t*,
+                                        Deps*);
 
 template <typename _DataType>
-Deps* (*dpnp_bitwise_and_default_c)(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                    const size_t, const size_t*, const size_t, const size_t*)
-                                    = dpnp_bitwise_and_c<_DataType>;
+Deps* (*dpnp_bitwise_and_default_c)(void*,
+                                    const void*,
+                                    const size_t,
+                                    const size_t*,
+                                    const size_t,
+                                    const void*,
+                                    const size_t,
+                                    const size_t*,
+                                    const size_t,
+                                    const size_t*) = dpnp_bitwise_and_c<_DataType>;
 
-template Deps* dpnp_bitwise_or_c<int>(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                       const size_t, const size_t*, const size_t, const size_t*, Deps*);
-template Deps* dpnp_bitwise_or_c<long>(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                        const size_t, const size_t*, const size_t, const size_t*, Deps*);
-
-template <typename _DataType>
-Deps* (*dpnp_bitwise_or_default_c)(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                   const size_t, const size_t*, const size_t, const size_t*)
-                                   = dpnp_bitwise_or_c<_DataType>;
-
-template Deps* dpnp_bitwise_xor_c<int>(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                       const size_t, const size_t*, const size_t, const size_t*, Deps*);
-template Deps* dpnp_bitwise_xor_c<long>(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                        const size_t, const size_t*, const size_t, const size_t*, Deps*);
-
-template <typename _DataType>
-Deps* (*dpnp_bitwise_xor_default_c)(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                   const size_t, const size_t*, const size_t, const size_t*)
-                                   = dpnp_bitwise_xor_c<_DataType>;
-
-template Deps* dpnp_left_shift_c<int>(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                       const size_t, const size_t*, const size_t, const size_t*, Deps*);
-template Deps* dpnp_left_shift_c<long>(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                        const size_t, const size_t*, const size_t, const size_t*, Deps*);
-
-template <typename _DataType>
-Deps* (*dpnp_left_shift_default_c)(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                   const size_t, const size_t*, const size_t, const size_t*)
-                                   = dpnp_left_shift_c<_DataType>;
-
-template Deps* dpnp_right_shift_c<int>(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                       const size_t, const size_t*, const size_t, const size_t*, Deps*);
-template Deps* dpnp_right_shift_c<long>(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                        const size_t, const size_t*, const size_t, const size_t*, Deps*);
+template Deps* dpnp_bitwise_or_c<int>(void*,
+                                      const void*,
+                                      const size_t,
+                                      const size_t*,
+                                      const size_t,
+                                      const void*,
+                                      const size_t,
+                                      const size_t*,
+                                      const size_t,
+                                      const size_t*,
+                                      Deps*);
+template Deps* dpnp_bitwise_or_c<long>(void*,
+                                       const void*,
+                                       const size_t,
+                                       const size_t*,
+                                       const size_t,
+                                       const void*,
+                                       const size_t,
+                                       const size_t*,
+                                       const size_t,
+                                       const size_t*,
+                                       Deps*);
 
 template <typename _DataType>
-Deps* (*dpnp_right_shift_default_c)(void*, const void*, const size_t, const size_t*, const size_t, const void*,
-                                   const size_t, const size_t*, const size_t, const size_t*)
-                                   = dpnp_right_shift_c<_DataType>;
+Deps* (*dpnp_bitwise_or_default_c)(void*,
+                                   const void*,
+                                   const size_t,
+                                   const size_t*,
+                                   const size_t,
+                                   const void*,
+                                   const size_t,
+                                   const size_t*,
+                                   const size_t,
+                                   const size_t*) = dpnp_bitwise_or_c<_DataType>;
+
+template Deps* dpnp_bitwise_xor_c<int>(void*,
+                                       const void*,
+                                       const size_t,
+                                       const size_t*,
+                                       const size_t,
+                                       const void*,
+                                       const size_t,
+                                       const size_t*,
+                                       const size_t,
+                                       const size_t*,
+                                       Deps*);
+template Deps* dpnp_bitwise_xor_c<long>(void*,
+                                        const void*,
+                                        const size_t,
+                                        const size_t*,
+                                        const size_t,
+                                        const void*,
+                                        const size_t,
+                                        const size_t*,
+                                        const size_t,
+                                        const size_t*,
+                                        Deps*);
+
+template <typename _DataType>
+Deps* (*dpnp_bitwise_xor_default_c)(void*,
+                                    const void*,
+                                    const size_t,
+                                    const size_t*,
+                                    const size_t,
+                                    const void*,
+                                    const size_t,
+                                    const size_t*,
+                                    const size_t,
+                                    const size_t*) = dpnp_bitwise_xor_c<_DataType>;
+
+template Deps* dpnp_left_shift_c<int>(void*,
+                                      const void*,
+                                      const size_t,
+                                      const size_t*,
+                                      const size_t,
+                                      const void*,
+                                      const size_t,
+                                      const size_t*,
+                                      const size_t,
+                                      const size_t*,
+                                      Deps*);
+template Deps* dpnp_left_shift_c<long>(void*,
+                                       const void*,
+                                       const size_t,
+                                       const size_t*,
+                                       const size_t,
+                                       const void*,
+                                       const size_t,
+                                       const size_t*,
+                                       const size_t,
+                                       const size_t*,
+                                       Deps*);
+
+template <typename _DataType>
+Deps* (*dpnp_left_shift_default_c)(void*,
+                                   const void*,
+                                   const size_t,
+                                   const size_t*,
+                                   const size_t,
+                                   const void*,
+                                   const size_t,
+                                   const size_t*,
+                                   const size_t,
+                                   const size_t*) = dpnp_left_shift_c<_DataType>;
+
+template Deps* dpnp_right_shift_c<int>(void*,
+                                       const void*,
+                                       const size_t,
+                                       const size_t*,
+                                       const size_t,
+                                       const void*,
+                                       const size_t,
+                                       const size_t*,
+                                       const size_t,
+                                       const size_t*,
+                                       Deps*);
+template Deps* dpnp_right_shift_c<long>(void*,
+                                        const void*,
+                                        const size_t,
+                                        const size_t*,
+                                        const size_t,
+                                        const void*,
+                                        const size_t,
+                                        const size_t*,
+                                        const size_t,
+                                        const size_t*,
+                                        Deps*);
+
+template <typename _DataType>
+Deps* (*dpnp_right_shift_default_c)(void*,
+                                    const void*,
+                                    const size_t,
+                                    const size_t*,
+                                    const size_t,
+                                    const void*,
+                                    const size_t,
+                                    const size_t*,
+                                    const size_t,
+                                    const size_t*) = dpnp_right_shift_c<_DataType>;
 
 static void func_map_init_bitwise_2arg_1type(func_map_t& fmap)
 {

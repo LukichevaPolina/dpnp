@@ -26,6 +26,8 @@
 #include <iostream>
 
 #include <dpnp_iface.hpp>
+#include "dpnp_async.hpp"
+#include "dpnp_async_pimpl.hpp"
 #include "dpnp_fptr.hpp"
 #include "queue_sycl.hpp"
 
@@ -50,8 +52,10 @@ template <typename _DataType, typename _idx_DataType>
 class dpnp_argsort_c_kernel;
 
 template <typename _DataType, typename _idx_DataType>
-void dpnp_argsort_c(void* array1_in, void* result1, size_t size)
+Deps* dpnp_argsort_c(void* array1_in, void* result1, size_t size, Deps* deps_in)
 {
+    deps_in->wait();
+
     _DataType* array_1 = reinterpret_cast<_DataType*>(array1_in);
     _idx_DataType* result = reinterpret_cast<_idx_DataType*>(result1);
 
@@ -63,7 +67,22 @@ void dpnp_argsort_c(void* array1_in, void* result1, size_t size)
     std::sort(policy, result, result + size, _argsort_less<_DataType, _idx_DataType>(array_1));
 
     policy.queue().wait();
+    return new Deps();
 }
+
+template Deps* dpnp_argsort_c<int, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_argsort_c<long, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_argsort_c<float, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_argsort_c<double, long>(void*, void*, size_t, Deps*);
+
+template <typename _DataType, typename _idx_DataType>
+Deps* dpnp_argsort_c(void* array1_in, void* result1, size_t size)
+{
+    return dpnp_argsort_c<_DataType, _idx_DataType>(array1_in, result1, size, new Deps());
+}
+
+template <typename _DataType, typename _idx_DataType>
+Deps* (*dpnp_argsort_default_c)(void*, void*, size_t) = dpnp_argsort_c<_DataType, _idx_DataType>;
 
 // template void dpnp_argsort_c<double, long>(void* array1_in, void* result1, size_t size);
 // template void dpnp_argsort_c<float, long>(void* array1_in, void* result1, size_t size);
@@ -279,8 +298,9 @@ template <typename _DataType>
 class dpnp_sort_c_kernel;
 
 template <typename _DataType>
-void dpnp_sort_c(void* array1_in, void* result1, size_t size)
+Deps* dpnp_sort_c(void* array1_in, void* result1, size_t size, Deps* deps_in)
 {
+    deps_in->wait();
     _DataType* array_1 = reinterpret_cast<_DataType*>(array1_in);
     _DataType* result = reinterpret_cast<_DataType*>(result1);
 
@@ -292,15 +312,29 @@ void dpnp_sort_c(void* array1_in, void* result1, size_t size)
     // affects other kernels
     std::sort(policy, result, result + size, _sort_less<_DataType>());
 
-    policy.queue().wait();
+    return new Deps();
 }
+
+template Deps* dpnp_sort_c<int>(void*, void*, size_t, Deps*);
+template Deps* dpnp_sort_c<long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_sort_c<float>(void*, void*, size_t, Deps*);
+template Deps* dpnp_sort_c<double>(void*, void*, size_t, Deps*);
+
+template <typename _DataType>
+Deps* dpnp_sort_c(void* array1_in, void* result1, size_t size)
+{
+    return dpnp_sort_c<_DataType>(array1_in, result1, size, new Deps());
+}
+
+template <typename _DataType>
+Deps* (*dpnp_sort_default_c)(void*, void*, size_t) = dpnp_sort_c<_DataType>;
 
 void func_map_init_sorting(func_map_t& fmap)
 {
-    fmap[DPNPFuncName::DPNP_FN_ARGSORT][eft_INT][eft_INT] = {eft_LNG, (void*)dpnp_argsort_c<int, long>};
-    fmap[DPNPFuncName::DPNP_FN_ARGSORT][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_argsort_c<long, long>};
-    fmap[DPNPFuncName::DPNP_FN_ARGSORT][eft_FLT][eft_FLT] = {eft_LNG, (void*)dpnp_argsort_c<float, long>};
-    fmap[DPNPFuncName::DPNP_FN_ARGSORT][eft_DBL][eft_DBL] = {eft_LNG, (void*)dpnp_argsort_c<double, long>};
+    fmap[DPNPFuncName::DPNP_FN_ARGSORT][eft_INT][eft_INT] = {eft_LNG, (void*)dpnp_argsort_default_c<int, long>};
+    fmap[DPNPFuncName::DPNP_FN_ARGSORT][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_argsort_default_c<long, long>};
+    fmap[DPNPFuncName::DPNP_FN_ARGSORT][eft_FLT][eft_FLT] = {eft_LNG, (void*)dpnp_argsort_default_c<float, long>};
+    fmap[DPNPFuncName::DPNP_FN_ARGSORT][eft_DBL][eft_DBL] = {eft_LNG, (void*)dpnp_argsort_default_c<double, long>};
 
     fmap[DPNPFuncName::DPNP_FN_PARTITION][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_partition_c<int>};
     fmap[DPNPFuncName::DPNP_FN_PARTITION][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_partition_c<long>};
@@ -312,10 +346,10 @@ void func_map_init_sorting(func_map_t& fmap)
     fmap[DPNPFuncName::DPNP_FN_SEARCHSORTED][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_searchsorted_c<float, long>};
     fmap[DPNPFuncName::DPNP_FN_SEARCHSORTED][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_searchsorted_c<double, long>};
 
-    fmap[DPNPFuncName::DPNP_FN_SORT][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_sort_c<int>};
-    fmap[DPNPFuncName::DPNP_FN_SORT][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_sort_c<long>};
-    fmap[DPNPFuncName::DPNP_FN_SORT][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_sort_c<float>};
-    fmap[DPNPFuncName::DPNP_FN_SORT][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_sort_c<double>};
+    fmap[DPNPFuncName::DPNP_FN_SORT][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_sort_default_c<int>};
+    fmap[DPNPFuncName::DPNP_FN_SORT][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_sort_default_c<long>};
+    fmap[DPNPFuncName::DPNP_FN_SORT][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_sort_default_c<float>};
+    fmap[DPNPFuncName::DPNP_FN_SORT][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_sort_default_c<double>};
 
     return;
 }

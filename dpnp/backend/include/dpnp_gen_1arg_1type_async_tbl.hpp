@@ -24,44 +24,50 @@
 //*****************************************************************************
 
 /*
- * This header file contains single argument bitwise functions definitions
+ * This header file contains single argument element wise functions definitions
  *
- * Macro `MACRO_2ARG_1TYPE_OP` must be defined before usage
+ * Macro `MACRO_1ARG_1TYPE_ASYNC_OP` must be defined before usage
  *
  * Parameters:
  * - public name of the function and kernel name
  * - operation used to calculate the result
+ * - mkl operation used to calculate the result
  *
  */
 
-#include "dpnp_async.hpp"
-
-#ifndef MACRO_2ARG_1TYPE_OP
-#error "MACRO_2ARG_1TYPE_OP is not defined"
+#ifndef MACRO_1ARG_1TYPE_ASYNC_OP
+#error "MACRO_1ARG_1TYPE_ASYNC_OP is not defined"
 #endif
 
 #ifdef _SECTION_DOCUMENTATION_GENERATION_
 
-#define MACRO_2ARG_1TYPE_OP(__name__, __operation__)                                                                    \
+#define MACRO_1ARG_1TYPE_ASYNC_OP(__name__, __operation1__, __operation2__)                                             \
     /** @ingroup BACKEND_API                                                                                         */ \
-    /** @brief Element wise operation function __name__                                                              */ \
+    /** @brief Per element operation function __name__                                                               */ \
     /**                                                                                                              */ \
-    /** Function "__name__" executes operator "__operation__" over corresponding elements of input arrays            */ \
+    /** Function "__name__" executes operator "__operation1__" over each element of the array                        */ \
     /**                                                                                                              */ \
+    /** @param[in]  array1   Input array.                                                                            */ \
     /** @param[out] result1  Output array.                                                                           */ \
-    /** @param[in]  array1   Input array 1.                                                                          */ \
-    /** @param[in]  size1    Number of elements in @ref array1                                                       */ \
-    /** @param[in]  array2   Input array 2.                                                                          */ \
-    /** @param[in]  size2    Number of elements in @ref array2                                                       */ \
+    /** @param[in]  size     Number of elements in the input array.                                                  */ \
+    /** @param[in]  deps     Dependent events.                                                                       */ \
     template <typename _DataType>                                                                                       \
-    Deps* __name__(void* result1, const void* array1, const size_t size1, const void* array2, const size_t size2);
+    Deps* __name__(void* array1, void* result1, size_t size, Deps* deps);
 
 #endif
 
-MACRO_2ARG_1TYPE_OP(dpnp_bitwise_and_c, input_elem1& input_elem2)
-MACRO_2ARG_1TYPE_OP(dpnp_bitwise_or_c, input_elem1 | input_elem2)
-MACRO_2ARG_1TYPE_OP(dpnp_bitwise_xor_c, input_elem1 ^ input_elem2)
-MACRO_2ARG_1TYPE_OP(dpnp_left_shift_c, input_elem1 << input_elem2)
-MACRO_2ARG_1TYPE_OP(dpnp_right_shift_c, input_elem1 >> input_elem2)
+MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_conjugate_c, std::conj(input_elem), DPNP_QUEUE.submit(kernel_func))
+MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_copy_c, input_elem, DPNP_QUEUE.submit(kernel_func))
+MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_erf_c,
+                          cl::sycl::erf((double)input_elem),
+                          oneapi::mkl::vm::erf(DPNP_QUEUE, size, array1, result)) // no sycl::erf for int and long
+MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_negative_c, -input_elem, DPNP_QUEUE.submit(kernel_func))
+MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_recip_c,
+                          _DataType(1) / input_elem,
+                          DPNP_QUEUE.submit(kernel_func)) // error: no member named 'recip' in namespace 'cl::sycl'
+MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_sign_c,
+                          cl::sycl::sign((double)input_elem),
+                          DPNP_QUEUE.submit(kernel_func)) // no sycl::sign for int and long
+MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_square_c, input_elem* input_elem, oneapi::mkl::vm::sqr(DPNP_QUEUE, size, array1, result))
 
-#undef MACRO_2ARG_1TYPE_OP
+#undef MACRO_1ARG_1TYPE_ASYNC_OP

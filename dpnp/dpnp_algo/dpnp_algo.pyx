@@ -70,7 +70,7 @@ include "dpnp_algo_trigonometric.pyx"
 
 ctypedef void(*fptr_dpnp_arange_t)(size_t, size_t, void * , size_t)
 ctypedef void(*fptr_dpnp_astype_t)(const void * , void * , const size_t)
-ctypedef void(*fptr_dpnp_flatten_t)(const void * , void * , const size_t)
+ctypedef Deps*(*fptr_dpnp_flatten_t)(const void * , void * , const size_t)
 ctypedef void(*fptr_dpnp_initval_t)(void * , void * , size_t)
 
 
@@ -146,7 +146,7 @@ cpdef dparray dpnp_flatten(dparray array_):
     cdef dparray result = dparray(array_.size, dtype=result_type)
 
     cdef fptr_dpnp_flatten_t func = <fptr_dpnp_flatten_t > kernel_data.ptr
-    func(array_.get_data(), result.get_data(), array_.size)
+    func(array_.get_data(), result.get_data(), array_.size).wait()
 
     return result
 
@@ -267,7 +267,7 @@ cdef dparray call_fptr_1in_1out(DPNPFuncName fptr_name, utils.dpnp_descriptor x1
 
     cdef fptr_1in_1out_t func = <fptr_1in_1out_t > kernel_data.ptr
     """ Call FPTR function """
-    func(x1.get_data(), result.get_data(), x1.size)
+    func(x1.get_data(), result.get_data(), x1.size).wait()
 
     return result
 
