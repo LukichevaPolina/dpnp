@@ -41,6 +41,9 @@
 
 #ifdef _SECTION_DOCUMENTATION_GENERATION_
 
+#include "dpnp_async.hpp"
+#include "dpnp_async_pimpl.hpp"
+
 #define MACRO_1ARG_1TYPE_ASYNC_OP(__name__, __operation1__, __operation2__)                                             \
     /** @ingroup BACKEND_API                                                                                         */ \
     /** @brief Per element operation function __name__                                                               */ \
@@ -52,7 +55,7 @@
     /** @param[in]  size     Number of elements in the input array.                                                  */ \
     /** @param[in]  deps     Dependent events.                                                                       */ \
     template <typename _DataType>                                                                                       \
-    Deps* __name__(void* array1, void* result1, size_t size, Deps* deps);
+    Deps* __name__(void* array1, void* result1, size_t size, Deps* deps_in);
 
 #endif
 
@@ -60,7 +63,7 @@ MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_conjugate_c, std::conj(input_elem), DPNP_QUEUE.su
 MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_copy_c, input_elem, DPNP_QUEUE.submit(kernel_func))
 MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_erf_c,
                           cl::sycl::erf((double)input_elem),
-                          oneapi::mkl::vm::erf(DPNP_QUEUE, size, array1, result)) // no sycl::erf for int and long
+                          oneapi::mkl::vm::erf(DPNP_QUEUE, size, array1, result, deps_in->get_pImpl()->get())) // no sycl::erf for int and long
 MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_negative_c, -input_elem, DPNP_QUEUE.submit(kernel_func))
 MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_recip_c,
                           _DataType(1) / input_elem,
@@ -68,6 +71,7 @@ MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_recip_c,
 MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_sign_c,
                           cl::sycl::sign((double)input_elem),
                           DPNP_QUEUE.submit(kernel_func)) // no sycl::sign for int and long
-MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_square_c, input_elem* input_elem, oneapi::mkl::vm::sqr(DPNP_QUEUE, size, array1, result))
+MACRO_1ARG_1TYPE_ASYNC_OP(dpnp_square_c, input_elem* input_elem, 
+                          oneapi::mkl::vm::sqr(DPNP_QUEUE, size, array1, result, deps_in->get_pImpl()->get()))
 
 #undef MACRO_1ARG_1TYPE_ASYNC_OP
