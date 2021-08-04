@@ -29,15 +29,51 @@
 
 #include <dpnp_iface.hpp>
 
+#include "dpnp_async.hpp"
 #include "dpnp_fptr.hpp"
 #include "dpnp_utils.hpp"
 #include "queue_sycl.hpp"
 
 template <typename _DataType_dst, typename _DataType_src>
-void dpnp_copyto_c(void* destination, void* source, const size_t size)
+Deps* dpnp_copyto_c(void* destination, void* source, const size_t size, Deps* deps_in)
 {
-    __dpnp_copyto_c<_DataType_src, _DataType_dst>(source, destination, size);
+    return __dpnp_copyto_c<_DataType_src, _DataType_dst>(source, destination, size, deps_in);
 }
+template Deps* dpnp_copyto_c<bool, bool>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<bool, int>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<bool, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<bool, float>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<bool, double>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<int, bool>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<int, int>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<int, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<int, float>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<int, double>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<long, bool>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<long, int>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<long, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<long, float>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<long, double>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<float, bool>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<float, int>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<float, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<float, float>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<float, double>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<double, bool>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<double, int>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<double, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<double, float>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<double, double>(void*, void*, size_t, Deps*);
+template Deps* dpnp_copyto_c<std::complex<double>, std::complex<double>>(void*, void*, size_t, Deps*);
+
+template <typename _DataType_input, typename _DataType_output>
+Deps* dpnp_copyto_c(void* destination, void* source, size_t size)
+{
+    return dpnp_copyto_c<_DataType_input, _DataType_output>(destination, source, size, new Deps());
+}
+
+template <typename _DataType1, typename _DataType2>
+Deps* (*dpnp_copyto_default_c)(void*, void*, size_t) = dpnp_copyto_c<_DataType1, _DataType2>;
 
 template <typename _DataType>
 class dpnp_repeat_c_kernel;
@@ -143,33 +179,33 @@ void dpnp_elemwise_transpose_c(void* array1_in,
 
 void func_map_init_manipulation(func_map_t& fmap)
 {
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_BLN][eft_BLN] = {eft_BLN, (void*)dpnp_copyto_c<bool, bool>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_BLN][eft_INT] = {eft_BLN, (void*)dpnp_copyto_c<bool, int>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_BLN][eft_LNG] = {eft_BLN, (void*)dpnp_copyto_c<bool, long>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_BLN][eft_FLT] = {eft_BLN, (void*)dpnp_copyto_c<bool, float>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_BLN][eft_DBL] = {eft_BLN, (void*)dpnp_copyto_c<bool, double>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_INT][eft_BLN] = {eft_INT, (void*)dpnp_copyto_c<int, bool>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_copyto_c<int, int>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_INT][eft_LNG] = {eft_INT, (void*)dpnp_copyto_c<int, long>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_INT][eft_FLT] = {eft_INT, (void*)dpnp_copyto_c<int, float>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_INT][eft_DBL] = {eft_INT, (void*)dpnp_copyto_c<int, double>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_LNG][eft_BLN] = {eft_LNG, (void*)dpnp_copyto_c<long, bool>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_LNG][eft_INT] = {eft_LNG, (void*)dpnp_copyto_c<long, int>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_copyto_c<long, long>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_LNG][eft_FLT] = {eft_LNG, (void*)dpnp_copyto_c<long, float>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_LNG][eft_DBL] = {eft_LNG, (void*)dpnp_copyto_c<long, double>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_FLT][eft_BLN] = {eft_FLT, (void*)dpnp_copyto_c<float, bool>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_FLT][eft_INT] = {eft_FLT, (void*)dpnp_copyto_c<float, int>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_FLT][eft_LNG] = {eft_FLT, (void*)dpnp_copyto_c<float, long>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_copyto_c<float, float>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_FLT][eft_DBL] = {eft_FLT, (void*)dpnp_copyto_c<float, double>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_DBL][eft_BLN] = {eft_DBL, (void*)dpnp_copyto_c<double, bool>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_DBL][eft_INT] = {eft_DBL, (void*)dpnp_copyto_c<double, int>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_DBL][eft_LNG] = {eft_DBL, (void*)dpnp_copyto_c<double, long>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_DBL][eft_FLT] = {eft_DBL, (void*)dpnp_copyto_c<double, float>};
-    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_copyto_c<double, double>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_BLN][eft_BLN] = {eft_BLN, (void*)dpnp_copyto_default_c<bool, bool>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_BLN][eft_INT] = {eft_BLN, (void*)dpnp_copyto_default_c<bool, int>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_BLN][eft_LNG] = {eft_BLN, (void*)dpnp_copyto_default_c<bool, long>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_BLN][eft_FLT] = {eft_BLN, (void*)dpnp_copyto_default_c<bool, float>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_BLN][eft_DBL] = {eft_BLN, (void*)dpnp_copyto_default_c<bool, double>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_INT][eft_BLN] = {eft_INT, (void*)dpnp_copyto_default_c<int, bool>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_copyto_default_c<int, int>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_INT][eft_LNG] = {eft_INT, (void*)dpnp_copyto_default_c<int, long>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_INT][eft_FLT] = {eft_INT, (void*)dpnp_copyto_default_c<int, float>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_INT][eft_DBL] = {eft_INT, (void*)dpnp_copyto_default_c<int, double>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_LNG][eft_BLN] = {eft_LNG, (void*)dpnp_copyto_default_c<long, bool>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_LNG][eft_INT] = {eft_LNG, (void*)dpnp_copyto_default_c<long, int>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_copyto_default_c<long, long>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_LNG][eft_FLT] = {eft_LNG, (void*)dpnp_copyto_default_c<long, float>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_LNG][eft_DBL] = {eft_LNG, (void*)dpnp_copyto_default_c<long, double>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_FLT][eft_BLN] = {eft_FLT, (void*)dpnp_copyto_default_c<float, bool>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_FLT][eft_INT] = {eft_FLT, (void*)dpnp_copyto_default_c<float, int>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_FLT][eft_LNG] = {eft_FLT, (void*)dpnp_copyto_default_c<float, long>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_copyto_default_c<float, float>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_FLT][eft_DBL] = {eft_FLT, (void*)dpnp_copyto_default_c<float, double>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_DBL][eft_BLN] = {eft_DBL, (void*)dpnp_copyto_default_c<double, bool>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_DBL][eft_INT] = {eft_DBL, (void*)dpnp_copyto_default_c<double, int>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_DBL][eft_LNG] = {eft_DBL, (void*)dpnp_copyto_default_c<double, long>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_DBL][eft_FLT] = {eft_DBL, (void*)dpnp_copyto_default_c<double, float>};
+    fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_copyto_default_c<double, double>};
     fmap[DPNPFuncName::DPNP_FN_COPYTO][eft_C128][eft_C128] = {
-        eft_C128, (void*)dpnp_copyto_c<std::complex<double>, std::complex<double>>};
+        eft_C128, (void*)dpnp_copyto_default_c<std::complex<double>, std::complex<double>>};
 
     fmap[DPNPFuncName::DPNP_FN_REPEAT][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_repeat_c<int>};
     fmap[DPNPFuncName::DPNP_FN_REPEAT][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_repeat_c<long>};

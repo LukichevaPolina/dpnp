@@ -1174,9 +1174,21 @@ INP_DLLEXPORT void dpnp_repeat_c(const void* array_in, void* result, const size_
  * @param [out] destination  Destination array.
  * @param [in]  source       Source array.
  * @param [in]  size         Number of elements in destination array.
+ * @param [in]  deps        Dependent events.
  */
 template <typename _DataType_dst, typename _DataType_src>
-INP_DLLEXPORT void dpnp_copyto_c(void* destination, void* source, const size_t size);
+INP_DLLEXPORT Deps* dpnp_copyto_c(void* destination, void* source, const size_t size, Deps* deps);
+
+/**
+ * @ingroup BACKEND_API
+ * @brief copyto function.
+ *
+ * @param [out] destination  Destination array.
+ * @param [in]  source       Source array.
+ * @param [in]  size         Number of elements in destination array.
+ */
+template <typename _DataType_dst, typename _DataType_src>
+INP_DLLEXPORT Deps* dpnp_copyto_c(void* destination, void* source, const size_t size);
 
 /**
  * @ingroup BACKEND_API
