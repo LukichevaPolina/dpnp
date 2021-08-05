@@ -36,7 +36,6 @@
 #include <iostream>
 
 #include "dpnp_iface.hpp"
-#include "dpnp_async.hpp"
 
 int main(int, char**)
 {
