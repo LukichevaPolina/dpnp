@@ -38,6 +38,7 @@
 #include <iostream>
 
 #include "dpnp_iface.hpp"
+#include "dpnp_async.hpp"
 
 int main(int, char**)
 {
@@ -57,7 +58,7 @@ int main(int, char**)
     }
     std::cout << std::endl;
 
-    dpnp_cos_c<int, double>(array1, result, size);
+    dpnp_cos_c<int, double>(array1, result, size)->wait();
 
     for (size_t i = 0; i < 10; ++i)
     {
