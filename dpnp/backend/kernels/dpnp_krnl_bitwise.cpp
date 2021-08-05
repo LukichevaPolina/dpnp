@@ -211,7 +211,7 @@ template Deps* dpnp_bitwise_or_c<int>(void*,
                                       const size_t,
                                       const size_t*,
                                       Deps*);
-                                      
+
 template Deps* dpnp_bitwise_or_c<long>(void*,
                                        const void*,
                                        const size_t,
