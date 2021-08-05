@@ -679,7 +679,11 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
     template <typename _KernelNameSpecialization1,                                                                     \
               typename _KernelNameSpecialization2,                                                                     \
               typename _KernelNameSpecialization3>                                                                     \
-    class __name__##_kernel;                                                                                     \
+    class __name__##_kernel;                                                                                           \
+    template <typename _KernelNameSpecialization1,                                                                     \
+              typename _KernelNameSpecialization2,                                                                     \
+              typename _KernelNameSpecialization3>                                                                     \
+    class __name__##_opt_kernel;                                                                                       \
                                                                                                                        \
     template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>                         \
     Deps* __name__(void* result_out,                                                                                   \
@@ -734,7 +738,7 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
         };                                                                                                             \
         auto kernel_func = [&](cl::sycl::handler& cgh) {                                                               \
             cgh.depends_on(deps_in->get_pImpl()->get());                                                               \
-            cgh.parallel_for<class __name__##_kernel<_DataType_output, _DataType_input1, _DataType_input2>>(     \
+            cgh.parallel_for<class __name__##_kernel<_DataType_output, _DataType_input1, _DataType_input2>>(           \
                 gws, kernel_parallel_for_func);                                                                        \
         };                                                                                                             \
                                                                                                                        \
@@ -759,8 +763,39 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
         }                                                                                                              \
         else                                                                                                           \
         {                                                                                                              \
-            event = DPNP_QUEUE.submit(kernel_func);                                                                    \
-            event.wait();                                                                                              \
+            if (input1_size == 1 or input2_size == 1)                                                                  \
+            {                                                                                                          \
+                cl::sycl::range<1> opt_gws(result_size);                                                               \
+                auto opt_kernel_parallel_for_func = [=](cl::sycl::id<1> global_id) {                                   \
+                    const size_t i = global_id[0]; /*for (size_t i = 0; i < result_size; ++i)*/                        \
+                    _DataType_output input1_elem;                                                                      \
+                    _DataType_output input2_elem;                                                                      \
+                    if (input1_size == 1)                                                                              \
+                    {                                                                                                  \
+                        input1_elem = input1_data[0];                                                                  \
+                        input2_elem = input2_data[i];                                                                  \
+                    }                                                                                                  \
+                    else                                                                                               \
+                    {                                                                                                  \
+                        input1_elem = input1_data[i];                                                                  \
+                        input2_elem = input2_data[0];                                                                  \
+                    }                                                                                                  \
+                    result[i] = __operation1__;                                                                        \
+                };                                                                                                     \
+                auto opt_kernel_func = [&](cl::sycl::handler& cgh) {                                                   \
+                    cgh.depends_on(deps_in->get_pImpl()->get());                                                       \
+                    cgh.parallel_for<                                                                                  \
+                        class __name__##_opt_kernel<_DataType_output, _DataType_input1, _DataType_input2>>(            \
+                        opt_gws, opt_kernel_parallel_for_func);                                                        \
+                };                                                                                                     \
+                event = DPNP_QUEUE.submit(opt_kernel_func);                                                            \
+                event.wait();                                                                                          \
+            }                                                                                                          \
+            else                                                                                                       \
+            {                                                                                                          \
+                event = DPNP_QUEUE.submit(kernel_func);                                                                \
+                event.wait();                                                                                          \
+            }                                                                                                          \
         }                                                                                                              \
                                                                                                                        \
         input1_it->~DPNPC_id();                                                                                        \
