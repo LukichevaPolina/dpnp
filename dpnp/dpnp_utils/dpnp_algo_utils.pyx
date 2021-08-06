@@ -53,6 +53,7 @@ __all__ = [
     "checker_throw_runtime_error",
     "checker_throw_type_error",
     "checker_throw_value_error",
+    "create_output_descriptor_py",
     "dp2nd_array",
     "dpnp_descriptor",
     "get_axis_indeces",
@@ -72,7 +73,7 @@ def call_origin(function, *args, **kwargs):
     Call fallback function for unsupported cases
     """
 
-    # print(f"DPNP call_origin(): Fallback called")
+    # print(f"DPNP call_origin(): Fallback called. \n\t function={function}, \n\t args={args}, \n\t kwargs={kwargs}")
 
     kwargs_out = kwargs.get("out", None)
     if (kwargs_out is not None):
@@ -133,6 +134,12 @@ cpdef checker_throw_value_error(function_name, param_name, param, expected):
     err_msg = f"{ERROR_PREFIX} in function {function_name}() paramenter '{param_name}'"
     err_msg += f" expected `{expected}`, but '{param}' provided"
     raise ValueError(err_msg)
+
+
+cpdef dpnp_descriptor create_output_descriptor_py(shape_type_c output_shape, object d_type, object requested_out):
+    cdef DPNPFuncType c_type = dpnp_dtype_to_DPNPFuncType(d_type)
+
+    return create_output_descriptor(output_shape, c_type, requested_out)
 
 
 cpdef dp2nd_array(arr):
@@ -215,14 +222,14 @@ cpdef long _get_linear_index(key, tuple shape, int ndim):
 
 
 cdef tuple get_shape_dtype(object input_obj):
-    cdef dparray_shape_type return_shape  # empty shape means scalar
+    cdef shape_type_c return_shape  # empty shape means scalar
     return_dtype = None
 
     if issubclass(type(input_obj), (numpy.ndarray, dparray)):
         return (input_obj.shape, input_obj.dtype)
 
-    cdef dparray_shape_type elem_shape
-    cdef dparray_shape_type list_shape
+    cdef shape_type_c elem_shape
+    cdef shape_type_c list_shape
     if isinstance(input_obj, (list, tuple)):
         for elem in input_obj:
             elem_shape, elem_dtype = get_shape_dtype(elem)
@@ -266,8 +273,8 @@ cpdef find_common_type(object x1_obj, object x2_obj):
     return numpy.find_common_type(array_types, scalar_types)
 
 
-cdef dparray_shape_type get_common_shape(dparray_shape_type input1_shape, dparray_shape_type input2_shape):
-    cdef dparray_shape_type result_shape
+cdef shape_type_c get_common_shape(shape_type_c input1_shape, shape_type_c input2_shape):
+    cdef shape_type_c result_shape
 
     # ex (8, 1, 6, 1) and (7, 1, 5) -> (8, 1, 6, 1) and (1, 7, 1, 5)
     cdef size_t max_shape_size = max(input1_shape.size(), input2_shape.size())
@@ -290,8 +297,8 @@ cdef dparray_shape_type get_common_shape(dparray_shape_type input1_shape, dparra
     return result_shape
 
 
-cdef dparray_shape_type get_reduction_output_shape(dparray_shape_type input_shape, object axis, cpp_bool keepdims):
-    cdef dparray_shape_type result_shape
+cdef shape_type_c get_reduction_output_shape(shape_type_c input_shape, object axis, cpp_bool keepdims):
+    cdef shape_type_c result_shape
     cdef tuple axis_tuple = _object_to_tuple(axis)
 
     if axis is not None:
@@ -328,7 +335,11 @@ cdef DPNPFuncType get_output_c_type(DPNPFuncName funcID,
     checker_throw_value_error("get_output_c_type", "dtype and out", requested_dtype, requested_out)
 
 
-cdef dparray create_output_array(dparray_shape_type output_shape, DPNPFuncType c_type, object requested_out):
+cdef dparray create_output_array(shape_type_c output_shape, DPNPFuncType c_type, object requested_out):
+    """
+    TODO This function needs to be deleted. Replace with create_output_descriptor()
+    """
+
     cdef dparray result
 
     if requested_out is None:
@@ -341,6 +352,27 @@ cdef dparray create_output_array(dparray_shape_type output_shape, DPNPFuncType c
         result = requested_out
 
     return result
+
+cdef dpnp_descriptor create_output_descriptor(shape_type_c output_shape,
+                                              DPNPFuncType c_type,
+                                              dpnp_descriptor requested_out):
+    cdef dpnp_descriptor result_desc
+
+    if requested_out is None:
+        """ Create DPNP array """
+        result = dparray(output_shape, dtype=dpnp_DPNPFuncType_to_dtype( < size_t > c_type))
+        result_desc = dpnp_descriptor(result)
+    else:
+        """ Based on 'out' parameter """
+        if (output_shape != requested_out.shape):
+            checker_throw_value_error("create_output_array", "out.shape", requested_out.shape, output_shape)
+
+        if isinstance(requested_out, dpnp_descriptor):
+            result_desc = requested_out
+        else:
+            result_desc = dpnp_descriptor(requested_out)
+
+    return result_desc
 
 
 cpdef nd2dp_array(arr):
@@ -355,16 +387,16 @@ cpdef nd2dp_array(arr):
     return result
 
 
-cpdef dparray_shape_type normalize_axis(object axis_obj, size_t shape_size_inp):
+cpdef shape_type_c normalize_axis(object axis_obj, size_t shape_size_inp):
     """
     Conversion of the transformation shape axis [-1, 0, 1] into [2, 0, 1] where numbers are `id`s of array shape axis
     """
 
-    cdef dparray_shape_type axis = _object_to_tuple(axis_obj)  # axis_obj might be a scalar
+    cdef shape_type_c axis = _object_to_tuple(axis_obj)  # axis_obj might be a scalar
     cdef ssize_t shape_size = shape_size_inp  # convert type for comparison with axis id
 
     cdef size_t axis_size = axis.size()
-    cdef dparray_shape_type result = dparray_shape_type(axis_size, 0)
+    cdef shape_type_c result = shape_type_c(axis_size, 0)
     for i in range(axis_size):
         if (axis[i] >= shape_size) or (axis[i] < -shape_size):
             checker_throw_axis_error("normalize_axis", "axis", axis[i], shape_size - 1)
@@ -440,6 +472,7 @@ cpdef cpp_bool use_origin_backend(input1=None, size_t compute_size=0):
 cdef class dpnp_descriptor:
     def __init__(self, obj):
         """ Initialze variables """
+        self.origin_pyobj = None
         self.descriptor = None
         self.dpnp_descriptor_data_size = 0
         self.dpnp_descriptor_is_scalar = True
@@ -452,6 +485,8 @@ cdef class dpnp_descriptor:
         if self.descriptor["version"] != 3:
             return
 
+        self.origin_pyobj = obj
+
         """ array size calculation """
         cdef Py_ssize_t shape_it = 0
         self.dpnp_descriptor_data_size = 1
@@ -461,7 +496,7 @@ cdef class dpnp_descriptor:
                 raise ValueError(f"{ERROR_PREFIX} dpnp_descriptor::__init__() invalid value {shape_it} in 'shape'")
             self.dpnp_descriptor_data_size *= shape_it
 
-        """ set scalar propery """
+        """ set scalar property """
         self.dpnp_descriptor_is_scalar = False
 
     @property
@@ -535,6 +570,9 @@ cdef class dpnp_descriptor:
         }
 
         return interface_dict
+
+    def get_pyobj(self):
+        return self.origin_pyobj
 
     cdef void * get_data(self):
         cdef long val = self.data

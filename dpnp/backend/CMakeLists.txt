@@ -187,7 +187,9 @@ set(DPNP_SRC
     src/dpnp_async.cpp
     src/dpnp_iface_fptr.cpp
     src/memory_sycl.cpp
-    src/queue_sycl.cpp)
+    src/queue_sycl.cpp
+    src/verbose.cpp
+    )
 
 if(DPNP_STATIC_LIB_ENABLE)
   add_library(dpnp_backend_c STATIC ${DPNP_SRC})
