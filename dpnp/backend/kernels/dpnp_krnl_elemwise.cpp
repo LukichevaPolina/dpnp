@@ -761,13 +761,13 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
                 event.wait();                                                                                          \
             }                                                                                                          \
         }                                                                                                              \
-        else if ((input1_size == 1 || input2_size == 1) and !(input1_size and input2_size))                            \
+        else if (input1_size == 1 || input2_size == 1)                                                                \
         {                                                                                                              \
             cl::sycl::range<1> opt_gws(result_size);                                                                   \
             auto opt_kernel_parallel_for_func = [=](cl::sycl::id<1> global_id) {                                       \
                 const size_t i = global_id[0]; /*for (size_t i = 0; i < result_size; ++i)*/                            \
                 _DataType_output input1_elem = (input1_size == 1) ? input1_data[0] : input1_data[i];                   \
-                _DataType_output input2_elem = (input2_size == 1) ? input1_data[0] : input1_data[i];                   \
+                _DataType_output input2_elem = (input2_size == 1) ? input2_data[0] : input2_data[i];                   \
                 result[i] = __operation1__;                                                                            \
             };                                                                                                         \
             auto opt_kernel_func = [&](cl::sycl::handler& cgh) {                                                       \
