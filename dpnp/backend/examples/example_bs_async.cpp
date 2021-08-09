@@ -34,6 +34,8 @@
  * g++ -g dpnp/backend/examples/example_bs_async.cpp -Idpnp -Idpnp/backend/include -Ldpnp -Wl,-rpath='$ORIGIN'/dpnp -ldpnp_backend_c -o example_bs_async
  */
 
+#include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <iostream>
 
@@ -109,8 +111,8 @@ void black_scholes(double* price,
     Deps* a_sub_b_deps_in = new Deps();
     a_sub_b_deps_in->add(a_deps_out);
     a_sub_b_deps_in->add(b_deps_out);
-    Deps* a_sub_b_deps_out =
-        dpnp_subtract_c<double, double, double>(a_sub_b, a, size, &size, ndim, b, size, &size, ndim, NULL, a_sub_b_deps_in);
+    Deps* a_sub_b_deps_out = dpnp_subtract_c<double, double, double>(
+        a_sub_b, a, size, &size, ndim, b, size, &size, ndim, NULL, a_sub_b_deps_in);
 
     // a_sub_b_add_c = a_sub_b + c
     double* a_sub_b_add_c = (double*)dpnp_memory_alloc_c(size * sizeof(double));
@@ -238,52 +240,54 @@ void black_scholes(double* price,
         r_sub_P_add_Se, r_sub_P, size, &size, ndim, Se, size, &size, ndim, NULL, r_sub_P_add_Se_deps_in);
 
     // put[:] = r_sub_P_add_Se
-    Deps* copy_r_sub_P_add_Se_deps =
-        dpnp_copyto_c<double, double>(put, r_sub_P_add_Se, size, r_sub_P_add_Se_deps_out);
+    Deps* copy_r_sub_P_add_Se_deps = dpnp_copyto_c<double, double>(put, r_sub_P_add_Se, size, r_sub_P_add_Se_deps_out);
     copy_r_sub_P_add_Se_deps->wait();
 
     dpnp_memory_free_c(p_div_s);
     dpnp_memory_free_c(mr);
     dpnp_memory_free_c(vol_vol_two);
     dpnp_memory_free_c(quarter);
-
     dpnp_memory_free_c(z);
     dpnp_memory_free_c(sqrt_z);
     dpnp_memory_free_c(one);
     dpnp_memory_free_c(a);
     dpnp_memory_free_c(a_sub_b_add_c);
-
     dpnp_memory_free_c(a_sub_b);
     dpnp_memory_free_c(c);
     dpnp_memory_free_c(a_sub_b_sub_c);
-
     dpnp_memory_free_c(y);
     dpnp_memory_free_c(w1);
     dpnp_memory_free_c(erf_w1);
     dpnp_memory_free_c(halfs_mul_erf_w1);
     dpnp_memory_free_c(w2);
-
     dpnp_memory_free_c(erf_w2);
-
     dpnp_memory_free_c(halfs_mul_erf_w2);
     dpnp_memory_free_c(half);
     dpnp_memory_free_c(exp_b);
     dpnp_memory_free_c(b);
     dpnp_memory_free_c(d1);
-
     dpnp_memory_free_c(d2);
     dpnp_memory_free_c(Se_mul_d2);
     dpnp_memory_free_c(P_mul_d1);
     dpnp_memory_free_c(r);
     dpnp_memory_free_c(r_sub_P);
     dpnp_memory_free_c(Se);
-
     dpnp_memory_free_c(r_sub_P_add_Se);
 }
 
-int main(int, char**)
+double median(std::vector<double> times)
 {
-    const size_t SIZE = 256;
+    std::sort(times.begin(), times.end());
+    if (times.size() % 2)
+        return times[times.size() / 2];
+    return times[times.size() / 2 - 1] + times[times.size() / 2] / 2;
+}
+
+int main(int argc, char** argv)
+{
+    size_t SIZE = 1000;
+    if (argc > 1)
+        SIZE = std::stoi(argv[1]);
 
     const size_t SEED = 7777777;
     const long PL = 10, PH = 50;
@@ -320,20 +324,30 @@ int main(int, char**)
     dpnp_memory_free_c(mone);
     dpnp_memory_free_c(zero);
 
+    //------------ performance mesure ------------
     black_scholes(price, strike, t, RISK_FREE, VOLATILITY, call, put, SIZE);
+    std::vector<double> async_times;
+    for (int i = 0; i < 15; ++i)
+    {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        black_scholes(price, strike, t, RISK_FREE, VOLATILITY, call, put, SIZE);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        async_times.push_back(std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count());
+    }
 
-    std::cout << "call: ";
-    for (size_t i = 0; i < 10; ++i)
-    {
-        std::cout << call[i] << ", ";
-    }
-    std::cout << "..." << std::endl;
-    std::cout << "put: ";
-    for (size_t i = 0; i < 10; ++i)
-    {
-        std::cout << put[i] << ", ";
-    }
-    std::cout << "..." << std::endl;
+    std::cout << "Async time: " << median(async_times) << " s." << std::endl;
+    // std::cout << "call: ";
+    // for (size_t i = 0; i < 10; ++i)
+    // {
+    //     std::cout << call[i] << ", ";
+    // }
+    // std::cout << "..." << std::endl;
+    // std::cout << "put: ";
+    // for (size_t i = 0; i < 10; ++i)
+    // {
+    //     std::cout << put[i] << ", ";
+    // }
+    // std::cout << "..." << std::endl;
 
     dpnp_memory_free_c(put);
     dpnp_memory_free_c(call);
