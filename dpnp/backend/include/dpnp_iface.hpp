@@ -45,6 +45,8 @@
 #include "dpnp_iface_fft.hpp"
 #include "dpnp_iface_random.hpp"
 
+#include "dpnp_async.hpp"
+
 #ifdef _WIN32
 #define INP_DLLEXPORT __declspec(dllexport)
 #else
@@ -284,20 +286,48 @@ INP_DLLEXPORT void dpnp_dot_c(void* result_out,
  * @param [in]  input2_shape        Shape of first input array.
  * @param [in]  input2_shape_ndim   Number of second array dimensions.
  * @param [in]  where               Mask array.
- * @param [out] result1             Output array.
- * @param [in]  size                Number of elements in input arrays.
+ * @param [in]  deps                Dependent events.
  */
 template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
-INP_DLLEXPORT void dpnp_cross_c(void* result_out,
-                                const void* input1_in,
-                                const size_t input1_size,
-                                const size_t* input1_shape,
-                                const size_t input1_shape_ndim,
-                                const void* input2_in,
-                                const size_t input2_size,
-                                const size_t* input2_shape,
-                                const size_t input2_shape_ndim,
-                                const size_t* where);
+INP_DLLEXPORT Deps* dpnp_cross_c(void* result_out,
+                                 const void* input1_in,
+                                 const size_t input1_size,
+                                 const size_t* input1_shape,
+                                 const size_t input1_shape_ndim,
+                                 const void* input2_in,
+                                 const size_t input2_size,
+                                 const size_t* input2_shape,
+                                 const size_t input2_shape_ndim,
+                                 const size_t* where,
+                                 Deps* deps);
+
+/**
+ * @ingroup BACKEND_API
+ * @brief Custom implementation of cross function
+ *
+ * @param [out] result_out          Output array.
+ * @param [in]  input1_in           First input array.
+ * @param [in]  input1_size         Size of first input array.
+ * @param [in]  input1_shape        Shape of first input array.
+ * @param [in]  input1_shape_ndim   Number of first array dimensions.
+ * @param [in]  input2_in           Second input array.
+ * @param [in]  input2_size         Shape of second input array.
+ * @param [in]  input2_shape        Shape of first input array.
+ * @param [in]  input2_shape_ndim   Number of second array dimensions.
+ * @param [in]  where               Mask array.
+ */
+
+template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
+INP_DLLEXPORT Deps* dpnp_cross_c(void* result_out,
+                                 const void* input1_in,
+                                 const size_t input1_size,
+                                 const size_t* input1_shape,
+                                 const size_t input1_shape_ndim,
+                                 const void* input2_in,
+                                 const size_t input2_size,
+                                 const size_t* input2_shape,
+                                 const size_t input2_shape_ndim,
+                                 const size_t* where);
 
 /**
  * @ingroup BACKEND_API
@@ -306,10 +336,21 @@ INP_DLLEXPORT void dpnp_cross_c(void* result_out,
  * @param [in]  array1_in  Input array.
  * @param [out] result1    Output array.
  * @param [in]  size       Number of elements in input arrays.
- *
+ * @param [in]  deps       Dependent events.
  */
 template <typename _DataType_input, typename _DataType_output>
-INP_DLLEXPORT void dpnp_cumprod_c(void* array1_in, void* result1, size_t size);
+INP_DLLEXPORT Deps* dpnp_cumprod_c(void* array1_in, void* result1, size_t size, Deps* deps);
+
+/**
+ * @ingroup BACKEND_API
+ * @brief Custom implementation of cumprod function
+ *
+ * @param [in]  array1_in  Input array.
+ * @param [out] result1    Output array.
+ * @param [in]  size       Number of elements in input arrays.
+ */
+template <typename _DataType_input, typename _DataType_output>
+INP_DLLEXPORT Deps* dpnp_cumprod_c(void* array1_in, void* result1, size_t size);
 
 /**
  * @ingroup BACKEND_API
@@ -318,10 +359,21 @@ INP_DLLEXPORT void dpnp_cumprod_c(void* array1_in, void* result1, size_t size);
  * @param [in]  array1_in  Input array.
  * @param [out] result1    Output array.
  * @param [in]  size       Number of elements in input arrays.
- *
+ * @param [in]  deps       Dependent events.
  */
 template <typename _DataType_input, typename _DataType_output>
-INP_DLLEXPORT void dpnp_cumsum_c(void* array1_in, void* result1, size_t size);
+INP_DLLEXPORT Deps* dpnp_cumsum_c(void* array1_in, void* result1, size_t size, Deps* deps);
+
+/**
+ * @ingroup BACKEND_API
+ * @brief Custom implementation of cumsum function
+ *
+ * @param [in]  array1_in  Input array.
+ * @param [out] result1    Output array.
+ * @param [in]  size       Number of elements in input arrays.
+ */
+template <typename _DataType_input, typename _DataType_output>
+INP_DLLEXPORT Deps* dpnp_cumsum_c(void* array1_in, void* result1, size_t size);
 
 /**
  * @ingroup BACKEND_API
@@ -467,9 +519,21 @@ INP_DLLEXPORT void dpnp_eigvals_c(const void* array_in, void* result1, size_t si
  * @param [in]  array   Input array with data.
  * @param [out] result  Output array with indeces.
  * @param [in]  size    Number of elements in input arrays.
+ * @param [in]  deps    Dependent events.
  */
 template <typename _DataType, typename _idx_DataType>
-INP_DLLEXPORT void dpnp_argsort_c(void* array, void* result, size_t size);
+INP_DLLEXPORT Deps* dpnp_argsort_c(void* array, void* result, size_t size, Deps* deps);
+
+/**
+ * @ingroup BACKEND_API
+ * @brief math library implementation of argsort function
+ *
+ * @param [in]  array   Input array with data.
+ * @param [out] result  Output array with indeces.
+ * @param [in]  size    Number of elements in input arrays.
+ */
+template <typename _DataType, typename _idx_DataType>
+INP_DLLEXPORT Deps* dpnp_argsort_c(void* array, void* result, size_t size);
 
 /**
  * @ingroup BACKEND_API
@@ -493,9 +557,21 @@ INP_DLLEXPORT void dpnp_searchsorted_c(
  * @param [in]  array   Input array with data.
  * @param [out] result  Output array with indeces.
  * @param [in]  size    Number of elements in input arrays.
+ * @param [in]  deps    Dependent events.
  */
 template <typename _DataType>
-INP_DLLEXPORT void dpnp_sort_c(void* array, void* result, size_t size);
+INP_DLLEXPORT Deps* dpnp_sort_c(void* array, void* result, size_t size, Deps* deps);
+
+/**
+ * @ingroup BACKEND_API
+ * @brief math library implementation of sort function
+ *
+ * @param [in]  array   Input array with data.
+ * @param [out] result  Output array with indeces.
+ * @param [in]  size    Number of elements in input arrays.
+ */
+template <typename _DataType>
+INP_DLLEXPORT Deps* dpnp_sort_c(void* array, void* result, size_t size);
 
 /**
  * @ingroup BACKEND_API
@@ -838,49 +914,90 @@ INP_DLLEXPORT void dpnp_var_c(
  * @param [in]  array1_in  Input array.
  * @param [out] result1    Output array.
  * @param [in]  size       Number of elements in the input array.
+ * @param [in]  deps       Dependent events.
  */
 template <typename _DataType>
-INP_DLLEXPORT void dpnp_invert_c(void* array1_in, void* result, size_t size);
+INP_DLLEXPORT Deps* dpnp_invert_c(void* array1_in, void* result, size_t size, Deps* deps);
+
+/**
+ * @ingroup BACKEND_API
+ * @brief Implementation of invert function
+ *
+ * @param [in]  array1_in  Input array.
+ * @param [out] result1    Output array.
+ * @param [in]  size       Number of elements in the input array.
+ */
+template <typename _DataType>
+INP_DLLEXPORT Deps* dpnp_invert_c(void* array1_in, void* result, size_t size);
 
 #define MACRO_2ARG_1TYPE_OP(__name__, __operation__)                                                                   \
     template <typename _DataType>                                                                                      \
-    INP_DLLEXPORT void __name__(void* result_out,                                                                      \
-                                const void* input1_in,                                                                 \
-                                const size_t input1_size,                                                              \
-                                const size_t* input1_shape,                                                            \
-                                const size_t input1_shape_ndim,                                                        \
-                                const void* input2_in,                                                                 \
-                                const size_t input2_size,                                                              \
-                                const size_t* input2_shape,                                                            \
-                                const size_t input2_shape_ndim,                                                        \
-                                const size_t* where);
+    INP_DLLEXPORT Deps* __name__(void* result_out,                                                                     \
+                                 const void* input1_in,                                                                \
+                                 const size_t input1_size,                                                             \
+                                 const size_t* input1_shape,                                                           \
+                                 const size_t input1_shape_ndim,                                                       \
+                                 const void* input2_in,                                                                \
+                                 const size_t input2_size,                                                             \
+                                 const size_t* input2_shape,                                                           \
+                                 const size_t input2_shape_ndim,                                                       \
+                                 const size_t* where,                                                                  \
+                                 Deps* deps);                                                                          \
+    template <typename _DataType>                                                                                      \
+    INP_DLLEXPORT Deps* __name__(void* result_out,                                                                     \
+                                 const void* input1_in,                                                                \
+                                 const size_t input1_size,                                                             \
+                                 const size_t* input1_shape,                                                           \
+                                 const size_t input1_shape_ndim,                                                       \
+                                 const void* input2_in,                                                                \
+                                 const size_t input2_size,                                                             \
+                                 const size_t* input2_shape,                                                           \
+                                 const size_t input2_shape_ndim,                                                       \
+                                 const size_t* where);
 
 #include <dpnp_gen_2arg_1type_tbl.hpp>
 
 #define MACRO_1ARG_1TYPE_OP(__name__, __operation1__, __operation2__)                                                  \
     template <typename _DataType>                                                                                      \
-    INP_DLLEXPORT void __name__(void* array1, void* result1, size_t size);
+    INP_DLLEXPORT Deps* __name__(void* array1, void* result1, size_t size, Deps* deps);                                \
+    template <typename _DataType>                                                                                      \
+    INP_DLLEXPORT Deps* __name__(void* array1, void* result1, size_t size);
 
 #include <dpnp_gen_1arg_1type_tbl.hpp>
 
 #define MACRO_1ARG_2TYPES_OP(__name__, __operation1__, __operation2__)                                                 \
     template <typename _DataType_input, typename _DataType_output>                                                     \
-    INP_DLLEXPORT void __name__(void* array1, void* result1, size_t size);
+    INP_DLLEXPORT Deps* __name__(void* array1, void* result1, size_t size, Deps* deps);                                \
+    template <typename _DataType_input, typename _DataType_output>                                                     \
+    INP_DLLEXPORT Deps* __name__(void* array1, void* result1, size_t size);
 
 #include <dpnp_gen_1arg_2type_tbl.hpp>
 
 #define MACRO_2ARG_3TYPES_OP(__name__, __operation1__, __operation2__)                                                 \
     template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>                         \
-    INP_DLLEXPORT void __name__(void* result_out,                                                                      \
-                                const void* input1_in,                                                                 \
-                                const size_t input1_size,                                                              \
-                                const size_t* input1_shape,                                                            \
-                                const size_t input1_shape_ndim,                                                        \
-                                const void* input2_in,                                                                 \
-                                const size_t input2_size,                                                              \
-                                const size_t* input2_shape,                                                            \
-                                const size_t input2_shape_ndim,                                                        \
-                                const size_t* where);
+    INP_DLLEXPORT Deps* __name__(void* result_out,                                                                     \
+                                 const void* input1_in,                                                                \
+                                 const size_t input1_size,                                                             \
+                                 const size_t* input1_shape,                                                           \
+                                 const size_t input1_shape_ndim,                                                       \
+                                 const void* input2_in,                                                                \
+                                 const size_t input2_size,                                                             \
+                                 const size_t* input2_shape,                                                           \
+                                 const size_t input2_shape_ndim,                                                       \
+                                 const size_t* where,                                                                  \
+                                 Deps* deps);                                                                          \
+                                                                                                                       \
+    template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>                         \
+    INP_DLLEXPORT Deps* __name__(void* result_out,                                                                     \
+                                 const void* input1_in,                                                                \
+                                 const size_t input1_size,                                                             \
+                                 const size_t* input1_shape,                                                           \
+                                 const size_t input1_shape_ndim,                                                       \
+                                 const void* input2_in,                                                                \
+                                 const size_t input2_size,                                                             \
+                                 const size_t* input2_shape,                                                           \
+                                 const size_t input2_shape_ndim,                                                       \
+                                 const size_t* where);
 
 #include <dpnp_gen_2arg_3type_tbl.hpp>
 
@@ -910,21 +1027,47 @@ INP_DLLEXPORT void dpnp_fill_diagonal_c(void* array1_in, void* val, size_t* shap
  * @param [in]  input2_shape        Shape of first input array.
  * @param [in]  input2_shape_ndim   Number of second array dimensions.
  * @param [in]  where               Mask array.
- * @param [out] result1             Output array.
- * @param [in]  size                Number of elements in input arrays.
+ * @param [in]  deps                Dependent events.
  */
 template <typename _DataType_input1, typename _DataType_input2, typename _DataType_output>
-INP_DLLEXPORT void dpnp_floor_divide_c(void* result_out,
-                                       const void* input1_in,
-                                       const size_t input1_size,
-                                       const size_t* input1_shape,
-                                       const size_t input1_shape_ndim,
-                                       const void* input2_in,
-                                       const size_t input2_size,
-                                       const size_t* input2_shape,
-                                       const size_t input2_shape_ndim,
-                                       const size_t* where);
+INP_DLLEXPORT Deps* dpnp_floor_divide_c(void* result_out,
+                                        const void* input1_in,
+                                        const size_t input1_size,
+                                        const size_t* input1_shape,
+                                        const size_t input1_shape_ndim,
+                                        const void* input2_in,
+                                        const size_t input2_size,
+                                        const size_t* input2_shape,
+                                        const size_t input2_shape_ndim,
+                                        const size_t* where,
+                                        Deps* deps);
 
+/**
+ * @ingroup BACKEND_API
+ * @brief floor_divide function.
+ *
+ * @param [out] result_out          Output array.
+ * @param [in]  input1_in           First input array.
+ * @param [in]  input1_size         Size of first input array.
+ * @param [in]  input1_shape        Shape of first input array.
+ * @param [in]  input1_shape_ndim   Number of first array dimensions.
+ * @param [in]  input2_in           Second input array.
+ * @param [in]  input2_size         Shape of second input array.
+ * @param [in]  input2_shape        Shape of first input array.
+ * @param [in]  input2_shape_ndim   Number of second array dimensions.
+ * @param [in]  where               Mask array.
+ */
+template <typename _DataType_input1, typename _DataType_input2, typename _DataType_output>
+INP_DLLEXPORT Deps* dpnp_floor_divide_c(void* result_out,
+                                        const void* input1_in,
+                                        const size_t input1_size,
+                                        const size_t* input1_shape,
+                                        const size_t input1_shape_ndim,
+                                        const void* input2_in,
+                                        const size_t input2_size,
+                                        const size_t* input2_shape,
+                                        const size_t input2_shape_ndim,
+                                        const size_t* where);
 /**
  * @ingroup BACKEND_API
  * @brief modf function.
@@ -971,21 +1114,47 @@ INP_DLLEXPORT void dpnp_ones_like_c(void* result, size_t size);
  * @param [in]  input2_shape        Shape of first input array.
  * @param [in]  input2_shape_ndim   Number of second array dimensions.
  * @param [in]  where               Mask array.
- * @param [out] result1             Output array.
- * @param [in]  size                Number of elements in input arrays.
+ * @param [in]  deps                Dependent events.
  */
 template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
-INP_DLLEXPORT void dpnp_remainder_c(void* result_out,
-                                    const void* input1_in,
-                                    const size_t input1_size,
-                                    const size_t* input1_shape,
-                                    const size_t input1_shape_ndim,
-                                    const void* input2_in,
-                                    const size_t input2_size,
-                                    const size_t* input2_shape,
-                                    const size_t input2_shape_ndim,
-                                    const size_t* where);
+INP_DLLEXPORT Deps* dpnp_remainder_c(void* result_out,
+                                     const void* input1_in,
+                                     const size_t input1_size,
+                                     const size_t* input1_shape,
+                                     const size_t input1_shape_ndim,
+                                     const void* input2_in,
+                                     const size_t input2_size,
+                                     const size_t* input2_shape,
+                                     const size_t input2_shape_ndim,
+                                     const size_t* where,
+                                     Deps* deps);
 
+/**
+ * @ingroup BACKEND_API
+ * @brief remainder function.
+ *
+ * @param [out] result_out          Output array.
+ * @param [in]  input1_in           First input array.
+ * @param [in]  input1_size         Size of first input array.
+ * @param [in]  input1_shape        Shape of first input array.
+ * @param [in]  input1_shape_ndim   Number of first array dimensions.
+ * @param [in]  input2_in           Second input array.
+ * @param [in]  input2_size         Shape of second input array.
+ * @param [in]  input2_shape        Shape of first input array.
+ * @param [in]  input2_shape_ndim   Number of second array dimensions.
+ * @param [in]  where               Mask array.
+ */
+template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
+INP_DLLEXPORT Deps* dpnp_remainder_c(void* result_out,
+                                     const void* input1_in,
+                                     const size_t input1_size,
+                                     const size_t* input1_shape,
+                                     const size_t input1_shape_ndim,
+                                     const void* input2_in,
+                                     const size_t input2_size,
+                                     const size_t* input2_shape,
+                                     const size_t input2_shape_ndim,
+                                     const size_t* where);
 /**
  * @ingroup BACKEND_API
  * @brief repeat elements of an array.
@@ -1005,9 +1174,21 @@ INP_DLLEXPORT void dpnp_repeat_c(const void* array_in, void* result, const size_
  * @param [out] destination  Destination array.
  * @param [in]  source       Source array.
  * @param [in]  size         Number of elements in destination array.
+ * @param [in]  deps        Dependent events.
  */
 template <typename _DataType_dst, typename _DataType_src>
-INP_DLLEXPORT void dpnp_copyto_c(void* destination, void* source, const size_t size);
+INP_DLLEXPORT Deps* dpnp_copyto_c(void* destination, void* source, const size_t size, Deps* deps);
+
+/**
+ * @ingroup BACKEND_API
+ * @brief copyto function.
+ *
+ * @param [out] destination  Destination array.
+ * @param [in]  source       Source array.
+ * @param [in]  size         Number of elements in destination array.
+ */
+template <typename _DataType_dst, typename _DataType_src>
+INP_DLLEXPORT Deps* dpnp_copyto_c(void* destination, void* source, const size_t size);
 
 /**
  * @ingroup BACKEND_API

@@ -113,7 +113,7 @@ cpdef utils.dpnp_descriptor dpnp_full(result_shape, value_in, result_dtype):
     cdef shape_type_c result_shape_c = utils._object_to_tuple(result_shape)
     cdef utils.dpnp_descriptor result = utils.create_output_descriptor(result_shape_c, kernel_data.return_type, None)
 
-    cdef fptr_1in_1out_t func = <fptr_1in_1out_t > kernel_data.ptr
+    cdef fptr_full_t func = <fptr_full_t > kernel_data.ptr
     # Call FPTR function
     func(array_fill.get_data(), result.get_data(), result.size)
 
@@ -136,7 +136,7 @@ cpdef utils.dpnp_descriptor dpnp_full_like(result_shape, value_in, result_dtype)
     cdef shape_type_c result_shape_c = utils._object_to_tuple(result_shape)
     cdef utils.dpnp_descriptor result = utils.create_output_descriptor(result_shape_c, kernel_data.return_type, None)
 
-    cdef fptr_1in_1out_t func = <fptr_1in_1out_t > kernel_data.ptr
+    cdef fptr_full_t func = <fptr_full_t > kernel_data.ptr
     # Call FPTR function
     func(array_fill.get_data(), result.get_data(), result.size)
 

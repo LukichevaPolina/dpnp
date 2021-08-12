@@ -92,7 +92,7 @@ cpdef dpnp_copyto(utils.dpnp_descriptor dst, utils.dpnp_descriptor src, where=Tr
 
     cdef fptr_1in_1out_t func = <fptr_1in_1out_t > kernel_data.ptr
     # Call FPTR function
-    func(dst.get_data(), src.get_data(), dst.size)
+    func(dst.get_data(), src.get_data(), dst.size).wait()
 
 
 cpdef utils.dpnp_descriptor dpnp_expand_dims(utils.dpnp_descriptor in_array, axis):

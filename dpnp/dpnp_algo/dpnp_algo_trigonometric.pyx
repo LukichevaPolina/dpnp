@@ -143,7 +143,6 @@ cpdef utils.dpnp_descriptor dpnp_radians(utils.dpnp_descriptor x1):
 cpdef utils.dpnp_descriptor dpnp_sin(utils.dpnp_descriptor x1, dparray out):
     return call_fptr_1in_1out(DPNP_FN_SIN, x1, x1.shape, out=out, func_name='sin')
 
-
 cpdef utils.dpnp_descriptor dpnp_sinh(utils.dpnp_descriptor x1):
     return call_fptr_1in_1out(DPNP_FN_SINH, x1, x1.shape)
 

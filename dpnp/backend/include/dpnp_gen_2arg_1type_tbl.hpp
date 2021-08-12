@@ -34,6 +34,8 @@
  *
  */
 
+#include "dpnp_async.hpp"
+
 #ifndef MACRO_2ARG_1TYPE_OP
 #error "MACRO_2ARG_1TYPE_OP is not defined"
 #endif
@@ -51,8 +53,12 @@
     /** @param[in]  size1    Number of elements in @ref array1                                                       */ \
     /** @param[in]  array2   Input array 2.                                                                          */ \
     /** @param[in]  size2    Number of elements in @ref array2                                                       */ \
+    /** @param[in]  deps     Dependent events.                                                                       */ \
     template <typename _DataType>                                                                                       \
-    void __name__(void* result1, const void* array1, const size_t size1, const void* array2, const size_t size2);
+    Deps* __name__(                                                                                                     \
+        void* result1, const void* array1, const size_t size1, const void* array2, const size_t size2, Deps* deps);     \
+    template <typename _DataType>                                                                                       \
+    Deps* __name__(void* result1, const void* array1, const size_t size1, const void* array2, const size_t size2);
 
 #endif
 

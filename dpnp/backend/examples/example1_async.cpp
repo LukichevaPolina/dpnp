@@ -23,51 +23,40 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 //*****************************************************************************
 
-/**
- * Example 3.
- *
- * This example shows simple usage of the DPNP C++ Backend library
- * to calculate cos of input vector elements
- *
- * Possible compile line:
- * . /opt/intel/oneapi/setvars.sh
- * g++ -g dpnp/backend/examples/example3.cpp -Idpnp -Idpnp/backend/include -Ldpnp -Wl,-rpath='$ORIGIN'/dpnp -ldpnp_backend_c -o example3
- *
- */
-
 #include <iostream>
-
-#include "dpnp_iface.hpp"
 #include "dpnp_async.hpp"
+#include "dpnp_iface.hpp"
 
-int main(int, char**)
+int main()
 {
-    const size_t size = 256;
+    const size_t size = 5;
 
     dpnp_queue_initialize_c();
-    std::cout << "SYCL queue is CPU: " << dpnp_queue_is_cpu_c() << std::endl;
 
-    int* array1 = (int*)dpnp_memory_alloc_c(size * sizeof(int));
+    double* a = (double*)dpnp_memory_alloc_c(size * sizeof(double));
+    double* b = (double*)dpnp_memory_alloc_c(size * sizeof(double));
+    double* c = (double*)dpnp_memory_alloc_c(size * sizeof(double));
+    double* d = (double*)dpnp_memory_alloc_c(size * sizeof(double));
     double* result = (double*)dpnp_memory_alloc_c(size * sizeof(double));
 
-    for (size_t i = 0; i < 10; ++i)
+    for (int i = 0; i < size; ++i)
     {
-        array1[i] = i;
+        a[i] = i;
+        b[i] = 1.0;
+        c[i] = 0;
+        d[i] = 0;
         result[i] = 0;
-        std::cout << ", " << array1[i];
     }
-    std::cout << std::endl;
 
-    dpnp_cos_c<int, double>(array1, result, size)->wait();
+    Deps* deps_c_out = dpnp_add_c<double, double, double>(c, a, size, &size, 1, b, size, &size, 1, NULL);
+    Deps* deps_d_out = dpnp_divide_c<double, double, double>(d, a, size, &size, 1, b, size, &size, 1, NULL);
 
-    for (size_t i = 0; i < 10; ++i)
-    {
-        std::cout << ", " << result[i];
-    }
-    std::cout << std::endl;
+    Deps* deps_result_in = new Deps();
+    deps_result_in->add(deps_c_out);
+    deps_result_in->add(deps_d_out);
 
-    dpnp_memory_free_c(result);
-    dpnp_memory_free_c(array1);
+    dpnp_multiply_c<double, double, double>(result, c, size, &size, 1, d, size, &size, 1, NULL, deps_result_in)->wait();
 
-    return 0;
+    for (int i = 0; i < size; ++i)
+        std::cout << result[i] << " ";
 }

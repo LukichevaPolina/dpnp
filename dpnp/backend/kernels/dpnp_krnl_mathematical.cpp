@@ -28,6 +28,8 @@
 #include <vector>
 
 #include <dpnp_iface.hpp>
+#include "dpnp_async.hpp"
+#include "dpnp_async_pimpl.hpp"
 #include "dpnp_fptr.hpp"
 #include "dpnp_iterator.hpp"
 #include "dpnp_utils.hpp"
@@ -126,16 +128,17 @@ template void dpnp_elemwise_absolute_c<long>(void* array1_in, void* result1, siz
 template void dpnp_elemwise_absolute_c<int>(void* array1_in, void* result1, size_t size);
 
 template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
-void dpnp_cross_c(void* result_out,
-                  const void* input1_in,
-                  const size_t input1_size,
-                  const size_t* input1_shape,
-                  const size_t input1_shape_ndim,
-                  const void* input2_in,
-                  const size_t input2_size,
-                  const size_t* input2_shape,
-                  const size_t input2_shape_ndim,
-                  const size_t* where)
+Deps* dpnp_cross_c(void* result_out,
+                   const void* input1_in,
+                   const size_t input1_size,
+                   const size_t* input1_shape,
+                   const size_t input1_shape_ndim,
+                   const void* input2_in,
+                   const size_t input2_size,
+                   const size_t* input2_shape,
+                   const size_t input2_shape_ndim,
+                   const size_t* where,
+                   Deps* deps_in)
 {
     (void)input1_size; // avoid warning unused variable
     (void)input1_shape;
@@ -144,6 +147,8 @@ void dpnp_cross_c(void* result_out,
     (void)input2_shape;
     (void)input2_shape_ndim;
     (void)where;
+
+    deps_in->wait();
 
     const _DataType_input1* input1 = reinterpret_cast<const _DataType_input1*>(input1_in);
     const _DataType_input2* input2 = reinterpret_cast<const _DataType_input2*>(input2_in);
@@ -155,18 +160,233 @@ void dpnp_cross_c(void* result_out,
 
     result[2] = input1[0] * input2[1] - input1[1] * input2[0];
 
-    return;
+    return new Deps();
 }
+
+template Deps* dpnp_cross_c<int, int, int>(void*,
+                                           const void*,
+                                           const size_t,
+                                           const size_t*,
+                                           const size_t,
+                                           const void*,
+                                           const size_t,
+                                           const size_t*,
+                                           const size_t,
+                                           const size_t*,
+                                           Deps*);
+template Deps* dpnp_cross_c<long, int, long>(void*,
+                                             const void*,
+                                             const size_t,
+                                             const size_t*,
+                                             const size_t,
+                                             const void*,
+                                             const size_t,
+                                             const size_t*,
+                                             const size_t,
+                                             const size_t*,
+                                             Deps*);
+template Deps* dpnp_cross_c<double, int, float>(void*,
+                                                const void*,
+                                                const size_t,
+                                                const size_t*,
+                                                const size_t,
+                                                const void*,
+                                                const size_t,
+                                                const size_t*,
+                                                const size_t,
+                                                const size_t*,
+                                                Deps*);
+template Deps* dpnp_cross_c<double, int, double>(void*,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 Deps*);
+template Deps* dpnp_cross_c<long, long, int>(void*,
+                                             const void*,
+                                             const size_t,
+                                             const size_t*,
+                                             const size_t,
+                                             const void*,
+                                             const size_t,
+                                             const size_t*,
+                                             const size_t,
+                                             const size_t*,
+                                             Deps*);
+template Deps* dpnp_cross_c<long, long, long>(void*,
+                                              const void*,
+                                              const size_t,
+                                              const size_t*,
+                                              const size_t,
+                                              const void*,
+                                              const size_t,
+                                              const size_t*,
+                                              const size_t,
+                                              const size_t*,
+                                              Deps*);
+template Deps* dpnp_cross_c<double, long, float>(void*,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 Deps*);
+template Deps* dpnp_cross_c<double, long, double>(void*,
+                                                  const void*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  const size_t,
+                                                  const void*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  Deps*);
+template Deps* dpnp_cross_c<double, float, int>(void*,
+                                                const void*,
+                                                const size_t,
+                                                const size_t*,
+                                                const size_t,
+                                                const void*,
+                                                const size_t,
+                                                const size_t*,
+                                                const size_t,
+                                                const size_t*,
+                                                Deps*);
+template Deps* dpnp_cross_c<double, float, long>(void*,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 Deps*);
+template Deps* dpnp_cross_c<float, float, float>(void*,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 Deps*);
+template Deps* dpnp_cross_c<double, float, double>(void*,
+                                                   const void*,
+                                                   const size_t,
+                                                   const size_t*,
+                                                   const size_t,
+                                                   const void*,
+                                                   const size_t,
+                                                   const size_t*,
+                                                   const size_t,
+                                                   const size_t*,
+                                                   Deps*);
+template Deps* dpnp_cross_c<double, double, int>(void*,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 Deps*);
+template Deps* dpnp_cross_c<double, double, long>(void*,
+                                                  const void*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  const size_t,
+                                                  const void*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  Deps*);
+template Deps* dpnp_cross_c<double, double, float>(void*,
+                                                   const void*,
+                                                   const size_t,
+                                                   const size_t*,
+                                                   const size_t,
+                                                   const void*,
+                                                   const size_t,
+                                                   const size_t*,
+                                                   const size_t,
+                                                   const size_t*,
+                                                   Deps*);
+template Deps* dpnp_cross_c<double, double, double>(void*,
+                                                    const void*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    const size_t,
+                                                    const void*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    Deps*);
+
+template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
+Deps* dpnp_cross_c(void* result_out,
+                   const void* input1_in,
+                   const size_t input1_size,
+                   const size_t* input1_shape,
+                   const size_t input1_shape_ndim,
+                   const void* input2_in,
+                   const size_t input2_size,
+                   const size_t* input2_shape,
+                   const size_t input2_shape_ndim,
+                   const size_t* where)
+{
+    return dpnp_cross_c<_DataType_output, _DataType_input1, _DataType_input2>(result_out,
+                                                                              input1_in,
+                                                                              input1_size,
+                                                                              input1_shape,
+                                                                              input1_shape_ndim,
+                                                                              input2_in,
+                                                                              input2_size,
+                                                                              input2_shape,
+                                                                              input2_shape_ndim,
+                                                                              where,
+                                                                              new Deps());
+}
+
+template <typename _DataType1, typename _DataType2, typename _DataType3>
+Deps* (*dpnp_cross_default_c)(void*,
+                              const void*,
+                              const size_t,
+                              const size_t*,
+                              const size_t,
+                              const void*,
+                              const size_t,
+                              const size_t*,
+                              const size_t,
+                              const size_t*) = dpnp_cross_c<_DataType1, _DataType2, _DataType3>;
 
 template <typename _KernelNameSpecialization1, typename _KernelNameSpecialization2>
 class dpnp_cumprod_c_kernel;
 
 template <typename _DataType_input, typename _DataType_output>
-void dpnp_cumprod_c(void* array1_in, void* result1, size_t size)
+Deps* dpnp_cumprod_c(void* array1_in, void* result1, size_t size, Deps* deps_in)
 {
+    deps_in->wait();
     if (!size)
     {
-        return;
+        return new Deps();
     }
 
     _DataType_input* array1 = reinterpret_cast<_DataType_input*>(array1_in);
@@ -180,18 +400,33 @@ void dpnp_cumprod_c(void* array1_in, void* result1, size_t size)
         result[i] = cur_res;
     }
 
-    return;
+    return new Deps();
 }
+
+template Deps* dpnp_cumprod_c<int, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_cumprod_c<long, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_cumprod_c<float, float>(void*, void*, size_t, Deps*);
+template Deps* dpnp_cumprod_c<double, double>(void*, void*, size_t, Deps*);
+
+template <typename _DataType_input, typename _DataType_output>
+Deps* dpnp_cumprod_c(void* array1_in, void* result1, size_t size)
+{
+    return dpnp_cumprod_c<_DataType_input, _DataType_output>(array1_in, result1, size, new Deps());
+}
+
+template <typename _DataType_input, typename _DataType_output>
+Deps* (*dpnp_cumprod_default_c)(void*, void*, size_t) = dpnp_cumprod_c<_DataType_input, _DataType_output>;
 
 template <typename _KernelNameSpecialization1, typename _KernelNameSpecialization2>
 class dpnp_cumsum_c_kernel;
 
 template <typename _DataType_input, typename _DataType_output>
-void dpnp_cumsum_c(void* array1_in, void* result1, size_t size)
+Deps* dpnp_cumsum_c(void* array1_in, void* result1, size_t size, Deps* deps_in)
 {
+    deps_in->wait();
     if (!size)
     {
-        return;
+        return new Deps();
     }
 
     _DataType_input* array1 = reinterpret_cast<_DataType_input*>(array1_in);
@@ -205,29 +440,44 @@ void dpnp_cumsum_c(void* array1_in, void* result1, size_t size)
         result[i] = cur_res;
     }
 
-    return;
+    return new Deps();
 }
+
+template Deps* dpnp_cumsum_c<int, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_cumsum_c<long, long>(void*, void*, size_t, Deps*);
+template Deps* dpnp_cumsum_c<float, float>(void*, void*, size_t, Deps*);
+template Deps* dpnp_cumsum_c<double, double>(void*, void*, size_t, Deps*);
+
+template <typename _DataType_input, typename _DataType_output>
+Deps* dpnp_cumsum_c(void* array1_in, void* result1, size_t size)
+{
+    return dpnp_cumsum_c<_DataType_input, _DataType_output>(array1_in, result1, size, new Deps());
+}
+
+template <typename _DataType_input, typename _DataType_output>
+Deps* (*dpnp_cumsum_default_c)(void*, void*, size_t) = dpnp_cumsum_c<_DataType_input, _DataType_output>;
 
 template <typename _KernelNameSpecialization1, typename _KernelNameSpecialization2, typename _KernelNameSpecialization3>
 class dpnp_floor_divide_c_kernel;
 
 template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
-void dpnp_floor_divide_c(void* result_out,
-                         const void* input1_in,
-                         const size_t input1_size,
-                         const size_t* input1_shape,
-                         const size_t input1_shape_ndim,
-                         const void* input2_in,
-                         const size_t input2_size,
-                         const size_t* input2_shape,
-                         const size_t input2_shape_ndim,
-                         const size_t* where)
+Deps* dpnp_floor_divide_c(void* result_out,
+                          const void* input1_in,
+                          const size_t input1_size,
+                          const size_t* input1_shape,
+                          const size_t input1_shape_ndim,
+                          const void* input2_in,
+                          const size_t input2_size,
+                          const size_t* input2_shape,
+                          const size_t input2_shape_ndim,
+                          const size_t* where,
+                          Deps* deps_in)
 {
     (void)where;
 
     if (!input1_size || !input2_size)
     {
-        return;
+        return new Deps();
     }
 
     _DataType_input1* input1_data = reinterpret_cast<_DataType_input1*>(const_cast<void*>(input1_in));
@@ -263,11 +513,13 @@ void dpnp_floor_divide_c(void* result_out,
         result[i] = static_cast<_DataType_output>(cl::sycl::floor(div));
     };
     auto kernel_func = [&](cl::sycl::handler& cgh) {
+        cgh.depends_on(deps_in->get_pImpl()->get());
         cgh.parallel_for<class dpnp_floor_divide_c_kernel<_DataType_output, _DataType_input1, _DataType_input2>>(
             gws, kernel_parallel_for_func);
     };
 
     cl::sycl::event event;
+    Deps* deps_out = new Deps();
 
     if (input1_size == input2_size)
     {
@@ -277,22 +529,239 @@ void dpnp_floor_divide_c(void* result_out,
             event = oneapi::mkl::vm::div(DPNP_QUEUE, input1_size, input1_data, input2_data, result);
             event.wait();
             event = oneapi::mkl::vm::floor(DPNP_QUEUE, input1_size, result, result);
+            deps_out->get_pImpl()->add(event);
         }
         else
         {
             event = DPNP_QUEUE.submit(kernel_func);
+            event.wait();
         }
     }
     else
     {
         event = DPNP_QUEUE.submit(kernel_func);
+        event.wait();
     }
-
-    event.wait();
 
     input1_it->~DPNPC_id();
     input2_it->~DPNPC_id();
+
+    return deps_out;
 }
+
+template Deps* dpnp_floor_divide_c<int, int, int>(void*,
+                                                  const void*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  const size_t,
+                                                  const void*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  Deps*);
+template Deps* dpnp_floor_divide_c<long, int, long>(void*,
+                                                    const void*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    const size_t,
+                                                    const void*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    Deps*);
+template Deps* dpnp_floor_divide_c<double, int, float>(void*,
+                                                       const void*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       const size_t,
+                                                       const void*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       Deps*);
+template Deps* dpnp_floor_divide_c<double, int, double>(void*,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        Deps*);
+template Deps* dpnp_floor_divide_c<long, long, int>(void*,
+                                                    const void*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    const size_t,
+                                                    const void*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    Deps*);
+template Deps* dpnp_floor_divide_c<long, long, long>(void*,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     Deps*);
+template Deps* dpnp_floor_divide_c<double, long, float>(void*,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        Deps*);
+template Deps* dpnp_floor_divide_c<double, long, double>(void*,
+                                                         const void*,
+                                                         const size_t,
+                                                         const size_t*,
+                                                         const size_t,
+                                                         const void*,
+                                                         const size_t,
+                                                         const size_t*,
+                                                         const size_t,
+                                                         const size_t*,
+                                                         Deps*);
+template Deps* dpnp_floor_divide_c<double, float, int>(void*,
+                                                       const void*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       const size_t,
+                                                       const void*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       Deps*);
+template Deps* dpnp_floor_divide_c<double, float, long>(void*,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        Deps*);
+template Deps* dpnp_floor_divide_c<float, float, float>(void*,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        Deps*);
+template Deps* dpnp_floor_divide_c<double, float, double>(void*,
+                                                          const void*,
+                                                          const size_t,
+                                                          const size_t*,
+                                                          const size_t,
+                                                          const void*,
+                                                          const size_t,
+                                                          const size_t*,
+                                                          const size_t,
+                                                          const size_t*,
+                                                          Deps*);
+template Deps* dpnp_floor_divide_c<double, double, int>(void*,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        Deps*);
+template Deps* dpnp_floor_divide_c<double, double, long>(void*,
+                                                         const void*,
+                                                         const size_t,
+                                                         const size_t*,
+                                                         const size_t,
+                                                         const void*,
+                                                         const size_t,
+                                                         const size_t*,
+                                                         const size_t,
+                                                         const size_t*,
+                                                         Deps*);
+template Deps* dpnp_floor_divide_c<double, double, float>(void*,
+                                                          const void*,
+                                                          const size_t,
+                                                          const size_t*,
+                                                          const size_t,
+                                                          const void*,
+                                                          const size_t,
+                                                          const size_t*,
+                                                          const size_t,
+                                                          const size_t*,
+                                                          Deps*);
+template Deps* dpnp_floor_divide_c<double, double, double>(void*,
+                                                           const void*,
+                                                           const size_t,
+                                                           const size_t*,
+                                                           const size_t,
+                                                           const void*,
+                                                           const size_t,
+                                                           const size_t*,
+                                                           const size_t,
+                                                           const size_t*,
+                                                           Deps*);
+
+template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
+Deps* dpnp_floor_divide_c(void* result_out,
+                          const void* input1_in,
+                          const size_t input1_size,
+                          const size_t* input1_shape,
+                          const size_t input1_shape_ndim,
+                          const void* input2_in,
+                          const size_t input2_size,
+                          const size_t* input2_shape,
+                          const size_t input2_shape_ndim,
+                          const size_t* where)
+{
+    return dpnp_floor_divide_c<_DataType_output, _DataType_input1, _DataType_input2>(result_out,
+                                                                                     input1_in,
+                                                                                     input1_size,
+                                                                                     input1_shape,
+                                                                                     input1_shape_ndim,
+                                                                                     input2_in,
+                                                                                     input2_size,
+                                                                                     input2_shape,
+                                                                                     input2_shape_ndim,
+                                                                                     where,
+                                                                                     new Deps());
+}
+
+template <typename _DataType1, typename _DataType2, typename _DataType3>
+Deps* (*dpnp_floor_divide_default_c)(void*,
+                                     const void*,
+                                     const size_t,
+                                     const size_t*,
+                                     const size_t,
+                                     const void*,
+                                     const size_t,
+                                     const size_t*,
+                                     const size_t,
+                                     const size_t*) = dpnp_floor_divide_c<_DataType1, _DataType2, _DataType3>;
 
 template <typename _KernelNameSpecialization1, typename _KernelNameSpecialization2>
 class dpnp_modf_c_kernel;
@@ -335,16 +804,17 @@ template <typename _KernelNameSpecialization1, typename _KernelNameSpecializatio
 class dpnp_remainder_c_kernel;
 
 template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
-void dpnp_remainder_c(void* result_out,
-                      const void* input1_in,
-                      const size_t input1_size,
-                      const size_t* input1_shape,
-                      const size_t input1_shape_ndim,
-                      const void* input2_in,
-                      const size_t input2_size,
-                      const size_t* input2_shape,
-                      const size_t input2_shape_ndim,
-                      const size_t* where)
+Deps* dpnp_remainder_c(void* result_out,
+                       const void* input1_in,
+                       const size_t input1_size,
+                       const size_t* input1_shape,
+                       const size_t input1_shape_ndim,
+                       const void* input2_in,
+                       const size_t input2_size,
+                       const size_t* input2_shape,
+                       const size_t input2_shape_ndim,
+                       const size_t* where,
+                       Deps* deps_in)
 {
     (void)input1_shape;
     (void)input1_shape_ndim;
@@ -354,6 +824,7 @@ void dpnp_remainder_c(void* result_out,
     (void)where;
 
     cl::sycl::event event;
+    Deps* deps_out = new Deps();
     _DataType_input1* input1 = reinterpret_cast<_DataType_input1*>(const_cast<void*>(input1_in));
     _DataType_input2* input2 = reinterpret_cast<_DataType_input2*>(const_cast<void*>(input2_in));
     _DataType_output* result = reinterpret_cast<_DataType_output*>(result_out);
@@ -361,7 +832,7 @@ void dpnp_remainder_c(void* result_out,
     if constexpr ((std::is_same<_DataType_input1, double>::value || std::is_same<_DataType_input1, float>::value) &&
                   std::is_same<_DataType_input2, _DataType_input1>::value)
     {
-        event = oneapi::mkl::vm::fmod(DPNP_QUEUE, input1_size, input1, input2, result);
+        event = oneapi::mkl::vm::fmod(DPNP_QUEUE, input1_size, input1, input2, result, deps_in->get_pImpl()->get());
         event.wait();
         event = oneapi::mkl::vm::add(DPNP_QUEUE, input1_size, result, input2, result);
         event.wait();
@@ -382,6 +853,7 @@ void dpnp_remainder_c(void* result_out,
         };
 
         auto kernel_func = [&](cl::sycl::handler& cgh) {
+            cgh.depends_on(deps_in->get_pImpl()->get());
             cgh.parallel_for<class dpnp_remainder_c_kernel<_DataType_input1, _DataType_input2, _DataType_output>>(
                 gws, kernel_parallel_for_func);
         };
@@ -389,8 +861,223 @@ void dpnp_remainder_c(void* result_out,
         event = DPNP_QUEUE.submit(kernel_func);
     }
 
-    event.wait();
+    deps_out->get_pImpl()->add(event);
+    return deps_out;
 }
+
+template Deps* dpnp_remainder_c<int, int, int>(void*,
+                                               const void*,
+                                               const size_t,
+                                               const size_t*,
+                                               const size_t,
+                                               const void*,
+                                               const size_t,
+                                               const size_t*,
+                                               const size_t,
+                                               const size_t*,
+                                               Deps*);
+template Deps* dpnp_remainder_c<long, int, long>(void*,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 Deps*);
+template Deps* dpnp_remainder_c<double, int, float>(void*,
+                                                    const void*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    const size_t,
+                                                    const void*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    Deps*);
+template Deps* dpnp_remainder_c<double, int, double>(void*,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     Deps*);
+template Deps* dpnp_remainder_c<long, long, int>(void*,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const void*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 const size_t,
+                                                 const size_t*,
+                                                 Deps*);
+template Deps* dpnp_remainder_c<long, long, long>(void*,
+                                                  const void*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  const size_t,
+                                                  const void*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  const size_t,
+                                                  const size_t*,
+                                                  Deps*);
+template Deps* dpnp_remainder_c<double, long, float>(void*,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     Deps*);
+template Deps* dpnp_remainder_c<double, long, double>(void*,
+                                                      const void*,
+                                                      const size_t,
+                                                      const size_t*,
+                                                      const size_t,
+                                                      const void*,
+                                                      const size_t,
+                                                      const size_t*,
+                                                      const size_t,
+                                                      const size_t*,
+                                                      Deps*);
+template Deps* dpnp_remainder_c<double, float, int>(void*,
+                                                    const void*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    const size_t,
+                                                    const void*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    const size_t,
+                                                    const size_t*,
+                                                    Deps*);
+template Deps* dpnp_remainder_c<double, float, long>(void*,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     Deps*);
+template Deps* dpnp_remainder_c<float, float, float>(void*,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     Deps*);
+template Deps* dpnp_remainder_c<double, float, double>(void*,
+                                                       const void*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       const size_t,
+                                                       const void*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       Deps*);
+template Deps* dpnp_remainder_c<double, double, int>(void*,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const void*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     const size_t,
+                                                     const size_t*,
+                                                     Deps*);
+template Deps* dpnp_remainder_c<double, double, long>(void*,
+                                                      const void*,
+                                                      const size_t,
+                                                      const size_t*,
+                                                      const size_t,
+                                                      const void*,
+                                                      const size_t,
+                                                      const size_t*,
+                                                      const size_t,
+                                                      const size_t*,
+                                                      Deps*);
+template Deps* dpnp_remainder_c<double, double, float>(void*,
+                                                       const void*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       const size_t,
+                                                       const void*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       const size_t,
+                                                       const size_t*,
+                                                       Deps*);
+template Deps* dpnp_remainder_c<double, double, double>(void*,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const void*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        const size_t,
+                                                        const size_t*,
+                                                        Deps*);
+
+template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>
+Deps* dpnp_remainder_c(void* result_out,
+                       const void* input1_in,
+                       const size_t input1_size,
+                       const size_t* input1_shape,
+                       const size_t input1_shape_ndim,
+                       const void* input2_in,
+                       const size_t input2_size,
+                       const size_t* input2_shape,
+                       const size_t input2_shape_ndim,
+                       const size_t* where)
+{
+    return dpnp_remainder_c<_DataType_output, _DataType_input1, _DataType_input2>(result_out,
+                                                                                  input1_in,
+                                                                                  input1_size,
+                                                                                  input1_shape,
+                                                                                  input1_shape_ndim,
+                                                                                  input2_in,
+                                                                                  input2_size,
+                                                                                  input2_shape,
+                                                                                  input2_shape_ndim,
+                                                                                  where,
+                                                                                  new Deps());
+}
+
+template <typename _DataType1, typename _DataType2, typename _DataType3>
+Deps* (*dpnp_remainder_default_c)(void*,
+                                  const void*,
+                                  const size_t,
+                                  const size_t*,
+                                  const size_t,
+                                  const void*,
+                                  const size_t,
+                                  const size_t*,
+                                  const size_t,
+                                  const size_t*) = dpnp_remainder_c<_DataType1, _DataType2, _DataType3>;
 
 template <typename _KernelNameSpecialization1, typename _KernelNameSpecialization2, typename _KernelNameSpecialization3>
 class dpnp_trapz_c_kernel;
@@ -469,85 +1156,103 @@ void func_map_init_mathematical(func_map_t& fmap)
     fmap[DPNPFuncName::DPNP_FN_AROUND][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_around_c<float>};
     fmap[DPNPFuncName::DPNP_FN_AROUND][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_around_c<double>};
 
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_cross_c<int, int, int>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_INT][eft_LNG] = {eft_LNG, (void*)dpnp_cross_c<long, int, long>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_INT][eft_FLT] = {eft_DBL, (void*)dpnp_cross_c<double, int, float>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_INT][eft_DBL] = {eft_DBL, (void*)dpnp_cross_c<double, int, double>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_LNG][eft_INT] = {eft_LNG, (void*)dpnp_cross_c<long, long, int>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_cross_c<long, long, long>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_LNG][eft_FLT] = {eft_DBL, (void*)dpnp_cross_c<double, long, float>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_LNG][eft_DBL] = {eft_DBL, (void*)dpnp_cross_c<double, long, double>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_FLT][eft_INT] = {eft_DBL, (void*)dpnp_cross_c<double, float, int>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_FLT][eft_LNG] = {eft_DBL, (void*)dpnp_cross_c<double, float, long>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_cross_c<float, float, float>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_FLT][eft_DBL] = {eft_DBL, (void*)dpnp_cross_c<double, float, double>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_DBL][eft_INT] = {eft_DBL, (void*)dpnp_cross_c<double, double, int>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_DBL][eft_LNG] = {eft_DBL, (void*)dpnp_cross_c<double, double, long>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_DBL][eft_FLT] = {eft_DBL, (void*)dpnp_cross_c<double, double, float>};
-    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_cross_c<double, double, double>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_cross_default_c<int, int, int>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_INT][eft_LNG] = {eft_LNG, (void*)dpnp_cross_default_c<long, int, long>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_INT][eft_FLT] = {eft_DBL, (void*)dpnp_cross_default_c<double, int, float>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_INT][eft_DBL] = {eft_DBL, (void*)dpnp_cross_default_c<double, int, double>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_LNG][eft_INT] = {eft_LNG, (void*)dpnp_cross_default_c<long, long, int>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_cross_default_c<long, long, long>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_LNG][eft_FLT] = {eft_DBL, (void*)dpnp_cross_default_c<double, long, float>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_LNG][eft_DBL] = {eft_DBL, (void*)dpnp_cross_default_c<double, long, double>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_FLT][eft_INT] = {eft_DBL, (void*)dpnp_cross_default_c<double, float, int>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_FLT][eft_LNG] = {eft_DBL, (void*)dpnp_cross_default_c<double, float, long>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_cross_default_c<float, float, float>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_FLT][eft_DBL] = {eft_DBL, (void*)dpnp_cross_default_c<double, float, double>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_DBL][eft_INT] = {eft_DBL, (void*)dpnp_cross_default_c<double, double, int>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_DBL][eft_LNG] = {eft_DBL, (void*)dpnp_cross_default_c<double, double, long>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_DBL][eft_FLT] = {eft_DBL, (void*)dpnp_cross_default_c<double, double, float>};
+    fmap[DPNPFuncName::DPNP_FN_CROSS][eft_DBL][eft_DBL] = {eft_DBL,
+                                                           (void*)dpnp_cross_default_c<double, double, double>};
 
-    fmap[DPNPFuncName::DPNP_FN_CUMPROD][eft_INT][eft_INT] = {eft_LNG, (void*)dpnp_cumprod_c<int, long>};
-    fmap[DPNPFuncName::DPNP_FN_CUMPROD][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_cumprod_c<long, long>};
-    fmap[DPNPFuncName::DPNP_FN_CUMPROD][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_cumprod_c<float, float>};
-    fmap[DPNPFuncName::DPNP_FN_CUMPROD][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_cumprod_c<double, double>};
+    fmap[DPNPFuncName::DPNP_FN_CUMPROD][eft_INT][eft_INT] = {eft_LNG, (void*)dpnp_cumprod_default_c<int, long>};
+    fmap[DPNPFuncName::DPNP_FN_CUMPROD][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_cumprod_default_c<long, long>};
+    fmap[DPNPFuncName::DPNP_FN_CUMPROD][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_cumprod_default_c<float, float>};
+    fmap[DPNPFuncName::DPNP_FN_CUMPROD][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_cumprod_default_c<double, double>};
 
-    fmap[DPNPFuncName::DPNP_FN_CUMSUM][eft_INT][eft_INT] = {eft_LNG, (void*)dpnp_cumsum_c<int, long>};
-    fmap[DPNPFuncName::DPNP_FN_CUMSUM][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_cumsum_c<long, long>};
-    fmap[DPNPFuncName::DPNP_FN_CUMSUM][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_cumsum_c<float, float>};
-    fmap[DPNPFuncName::DPNP_FN_CUMSUM][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_cumsum_c<double, double>};
+    fmap[DPNPFuncName::DPNP_FN_CUMSUM][eft_INT][eft_INT] = {eft_LNG, (void*)dpnp_cumsum_default_c<int, long>};
+    fmap[DPNPFuncName::DPNP_FN_CUMSUM][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_cumsum_default_c<long, long>};
+    fmap[DPNPFuncName::DPNP_FN_CUMSUM][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_cumsum_default_c<float, float>};
+    fmap[DPNPFuncName::DPNP_FN_CUMSUM][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_cumsum_default_c<double, double>};
 
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_floor_divide_c<int, int, int>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_INT][eft_LNG] = {eft_LNG, (void*)dpnp_floor_divide_c<long, int, long>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_INT][eft_FLT] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, int, float>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_INT][eft_DBL] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, int, double>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_LNG][eft_INT] = {eft_LNG, (void*)dpnp_floor_divide_c<long, long, int>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_INT][eft_INT] = {eft_INT,
+                                                                  (void*)dpnp_floor_divide_default_c<int, int, int>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_INT][eft_LNG] = {eft_LNG,
+                                                                  (void*)dpnp_floor_divide_default_c<long, int, long>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_INT][eft_FLT] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, int, float>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_INT][eft_DBL] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, int, double>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_LNG][eft_INT] = {eft_LNG,
+                                                                  (void*)dpnp_floor_divide_default_c<long, long, int>};
     fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_LNG][eft_LNG] = {eft_LNG,
-                                                                  (void*)dpnp_floor_divide_c<long, long, long>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_LNG][eft_FLT] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, long, float>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_LNG][eft_DBL] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, long, double>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_FLT][eft_INT] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, float, int>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_FLT][eft_LNG] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, float, long>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_FLT][eft_FLT] = {eft_FLT,
-                                                                  (void*)dpnp_floor_divide_c<float, float, float>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_FLT][eft_DBL] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, float, double>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_DBL][eft_INT] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, double, int>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_DBL][eft_LNG] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, double, long>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_DBL][eft_FLT] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, double, float>};
-    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_DBL][eft_DBL] = {eft_DBL,
-                                                                  (void*)dpnp_floor_divide_c<double, double, double>};
+                                                                  (void*)dpnp_floor_divide_default_c<long, long, long>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_LNG][eft_FLT] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, long, float>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_LNG][eft_DBL] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, long, double>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_FLT][eft_INT] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, float, int>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_FLT][eft_LNG] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, float, long>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_FLT][eft_FLT] = {
+        eft_FLT, (void*)dpnp_floor_divide_default_c<float, float, float>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_FLT][eft_DBL] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, float, double>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_DBL][eft_INT] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, double, int>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_DBL][eft_LNG] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, double, long>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_DBL][eft_FLT] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, double, float>};
+    fmap[DPNPFuncName::DPNP_FN_FLOOR_DIVIDE][eft_DBL][eft_DBL] = {
+        eft_DBL, (void*)dpnp_floor_divide_default_c<double, double, double>};
 
     fmap[DPNPFuncName::DPNP_FN_MODF][eft_INT][eft_INT] = {eft_DBL, (void*)dpnp_modf_c<int, double>};
     fmap[DPNPFuncName::DPNP_FN_MODF][eft_LNG][eft_LNG] = {eft_DBL, (void*)dpnp_modf_c<long, double>};
     fmap[DPNPFuncName::DPNP_FN_MODF][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_modf_c<float, float>};
     fmap[DPNPFuncName::DPNP_FN_MODF][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_modf_c<double, double>};
 
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_remainder_c<int, int, int>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_INT][eft_LNG] = {eft_LNG, (void*)dpnp_remainder_c<long, int, long>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_INT][eft_FLT] = {eft_DBL, (void*)dpnp_remainder_c<double, int, float>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_INT][eft_DBL] = {eft_DBL, (void*)dpnp_remainder_c<double, int, double>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_LNG][eft_INT] = {eft_LNG, (void*)dpnp_remainder_c<long, long, int>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_remainder_c<long, long, long>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_LNG][eft_FLT] = {eft_DBL, (void*)dpnp_remainder_c<double, long, float>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_LNG][eft_DBL] = {eft_DBL, (void*)dpnp_remainder_c<double, long, double>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_FLT][eft_INT] = {eft_DBL, (void*)dpnp_remainder_c<double, float, int>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_FLT][eft_LNG] = {eft_DBL, (void*)dpnp_remainder_c<double, float, long>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_remainder_c<float, float, float>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_FLT][eft_DBL] = {eft_DBL, (void*)dpnp_remainder_c<double, float, double>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_DBL][eft_INT] = {eft_DBL, (void*)dpnp_remainder_c<double, double, int>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_DBL][eft_LNG] = {eft_DBL, (void*)dpnp_remainder_c<double, double, long>};
-    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_DBL][eft_FLT] = {eft_DBL, (void*)dpnp_remainder_c<double, double, float>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_remainder_default_c<int, int, int>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_INT][eft_LNG] = {eft_LNG,
+                                                               (void*)dpnp_remainder_default_c<long, int, long>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_INT][eft_FLT] = {eft_DBL,
+                                                               (void*)dpnp_remainder_default_c<double, int, float>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_INT][eft_DBL] = {eft_DBL,
+                                                               (void*)dpnp_remainder_default_c<double, int, double>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_LNG][eft_INT] = {eft_LNG,
+                                                               (void*)dpnp_remainder_default_c<long, long, int>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_LNG][eft_LNG] = {eft_LNG,
+                                                               (void*)dpnp_remainder_default_c<long, long, long>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_LNG][eft_FLT] = {eft_DBL,
+                                                               (void*)dpnp_remainder_default_c<double, long, float>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_LNG][eft_DBL] = {eft_DBL,
+                                                               (void*)dpnp_remainder_default_c<double, long, double>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_FLT][eft_INT] = {eft_DBL,
+                                                               (void*)dpnp_remainder_default_c<double, float, int>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_FLT][eft_LNG] = {eft_DBL,
+                                                               (void*)dpnp_remainder_default_c<double, float, long>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_FLT][eft_FLT] = {eft_FLT,
+                                                               (void*)dpnp_remainder_default_c<float, float, float>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_FLT][eft_DBL] = {eft_DBL,
+                                                               (void*)dpnp_remainder_default_c<double, float, double>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_DBL][eft_INT] = {eft_DBL,
+                                                               (void*)dpnp_remainder_default_c<double, double, int>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_DBL][eft_LNG] = {eft_DBL,
+                                                               (void*)dpnp_remainder_default_c<double, double, long>};
+    fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_DBL][eft_FLT] = {eft_DBL,
+                                                               (void*)dpnp_remainder_default_c<double, double, float>};
     fmap[DPNPFuncName::DPNP_FN_REMAINDER][eft_DBL][eft_DBL] = {eft_DBL,
-                                                               (void*)dpnp_remainder_c<double, double, double>};
+                                                               (void*)dpnp_remainder_default_c<double, double, double>};
 
     fmap[DPNPFuncName::DPNP_FN_TRAPZ][eft_INT][eft_INT] = {eft_DBL, (void*)dpnp_trapz_c<int, int, double>};
     fmap[DPNPFuncName::DPNP_FN_TRAPZ][eft_INT][eft_LNG] = {eft_DBL, (void*)dpnp_trapz_c<int, long, double>};
