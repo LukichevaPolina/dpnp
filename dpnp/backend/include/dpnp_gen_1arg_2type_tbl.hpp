@@ -120,7 +120,7 @@ MACRO_1ARG_2TYPES_OP(dpnp_log2_c,
                      oneapi::mkl::vm::log2(DPNP_QUEUE, size, array1, result, deps_in->get_pImpl()->get()))
 MACRO_1ARG_2TYPES_OP(dpnp_log_c,
                      cl::sycl::log(input_elem),
-                     oneapi::mkl::vm::log(DPNP_QUEUE, size, array1, result, deps_in->get_pImpl()->get()))
+                     oneapi::mkl::vm::ln(DPNP_QUEUE, size, array1, result, deps_in->get_pImpl()->get()))
 MACRO_1ARG_2TYPES_OP(dpnp_radians_c, cl::sycl::radians(input_elem), DPNP_QUEUE.submit(kernel_func))
 MACRO_1ARG_2TYPES_OP(dpnp_sin_c,
                      cl::sycl::sin(input_elem),
