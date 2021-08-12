@@ -81,7 +81,7 @@ static void func_map_init_bitwise_1arg_1type(func_map_t& fmap)
     return;
 }
 
-#define MACRO_2ARG_1TYPE_ASYNC_OP(__name__, __operation__)                                                             \
+#define MACRO_2ARG_1TYPE_OP(__name__, __operation__)                                                                   \
     template <typename _KernelNameSpecialization>                                                                      \
     class __name__##_kernel;                                                                                           \
                                                                                                                        \
@@ -134,9 +134,8 @@ static void func_map_init_bitwise_1arg_1type(func_map_t& fmap)
                                                                                                                        \
         deps_out->get_pImpl()->add(event);                                                                             \
         return deps_out;                                                                                               \
-    }
-
-#define MACRO_2ARG_1TYPE_OP(__name__, __operation__)                                                                   \
+    }                                                                                                                  \
+                                                                                                                       \
     template <typename _DataType>                                                                                      \
     Deps* __name__(void* result_out,                                                                                   \
                    const void* input1_in,                                                                              \
@@ -162,7 +161,6 @@ static void func_map_init_bitwise_1arg_1type(func_map_t& fmap)
                                    new Deps());                                                                        \
     }
 
-#include <dpnp_gen_2arg_1type_async_tbl.hpp>
 #include <dpnp_gen_2arg_1type_tbl.hpp>
 
 template Deps* dpnp_bitwise_and_c<int>(void*,

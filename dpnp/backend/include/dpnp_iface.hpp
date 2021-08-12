@@ -930,7 +930,7 @@ INP_DLLEXPORT Deps* dpnp_invert_c(void* array1_in, void* result, size_t size, De
 template <typename _DataType>
 INP_DLLEXPORT Deps* dpnp_invert_c(void* array1_in, void* result, size_t size);
 
-#define MACRO_2ARG_1TYPE_ASYNC_OP(__name__, __operation__)                                                             \
+#define MACRO_2ARG_1TYPE_OP(__name__, __operation__)                                                                   \
     template <typename _DataType>                                                                                      \
     INP_DLLEXPORT Deps* __name__(void* result_out,                                                                     \
                                  const void* input1_in,                                                                \
@@ -942,11 +942,7 @@ INP_DLLEXPORT Deps* dpnp_invert_c(void* array1_in, void* result, size_t size);
                                  const size_t* input2_shape,                                                           \
                                  const size_t input2_shape_ndim,                                                       \
                                  const size_t* where,                                                                  \
-                                 Deps* deps);
-
-#include <dpnp_gen_2arg_1type_async_tbl.hpp>
-
-#define MACRO_2ARG_1TYPE_OP(__name__, __operation__)                                                                   \
+                                 Deps* deps);                                                                          \
     template <typename _DataType>                                                                                      \
     INP_DLLEXPORT Deps* __name__(void* result_out,                                                                     \
                                  const void* input1_in,                                                                \
@@ -961,31 +957,23 @@ INP_DLLEXPORT Deps* dpnp_invert_c(void* array1_in, void* result, size_t size);
 
 #include <dpnp_gen_2arg_1type_tbl.hpp>
 
-#define MACRO_1ARG_1TYPE_ASYNC_OP(__name__, __operation1__, __operation2__)                                            \
-    template <typename _DataType>                                                                                      \
-    INP_DLLEXPORT Deps* __name__(void* array1, void* result1, size_t size, Deps* deps);
-
-#include <dpnp_gen_1arg_1type_async_tbl.hpp>
-
 #define MACRO_1ARG_1TYPE_OP(__name__, __operation1__, __operation2__)                                                  \
+    template <typename _DataType>                                                                                      \
+    INP_DLLEXPORT Deps* __name__(void* array1, void* result1, size_t size, Deps* deps);                                \
     template <typename _DataType>                                                                                      \
     INP_DLLEXPORT Deps* __name__(void* array1, void* result1, size_t size);
 
 #include <dpnp_gen_1arg_1type_tbl.hpp>
 
-#define MACRO_1ARG_2TYPES_ASYNC_OP(__name__, __operation1__, __operation2__)                                           \
-    template <typename _DataType_input, typename _DataType_output>                                                     \
-    INP_DLLEXPORT Deps* __name__(void* array1, void* result1, size_t size, Deps* deps);
-
-#include <dpnp_gen_1arg_2type_async_tbl.hpp>
-
 #define MACRO_1ARG_2TYPES_OP(__name__, __operation1__, __operation2__)                                                 \
+    template <typename _DataType_input, typename _DataType_output>                                                     \
+    INP_DLLEXPORT Deps* __name__(void* array1, void* result1, size_t size, Deps* deps);                                \
     template <typename _DataType_input, typename _DataType_output>                                                     \
     INP_DLLEXPORT Deps* __name__(void* array1, void* result1, size_t size);
 
 #include <dpnp_gen_1arg_2type_tbl.hpp>
 
-#define MACRO_2ARG_3TYPES_ASYNC_OP(__name__, __operation1__, __operation2__)                                           \
+#define MACRO_2ARG_3TYPES_OP(__name__, __operation1__, __operation2__)                                                 \
     template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>                         \
     INP_DLLEXPORT Deps* __name__(void* result_out,                                                                     \
                                  const void* input1_in,                                                                \
@@ -997,11 +985,8 @@ INP_DLLEXPORT Deps* dpnp_invert_c(void* array1_in, void* result, size_t size);
                                  const size_t* input2_shape,                                                           \
                                  const size_t input2_shape_ndim,                                                       \
                                  const size_t* where,                                                                  \
-                                 Deps* deps);
-
-#include <dpnp_gen_2arg_3type_async_tbl.hpp>
-
-#define MACRO_2ARG_3TYPES_OP(__name__, __operation1__, __operation2__)                                                 \
+                                 Deps* deps);                                                                          \
+                                                                                                                       \
     template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>                         \
     INP_DLLEXPORT Deps* __name__(void* result_out,                                                                     \
                                  const void* input1_in,                                                                \

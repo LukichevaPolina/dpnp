@@ -35,7 +35,7 @@
 #include "dpnp_async.hpp"
 #include "dpnp_async_pimpl.hpp"
 
-#define MACRO_1ARG_2TYPES_ASYNC_OP(__name__, __operation1__, __operation2__)                                           \
+#define MACRO_1ARG_2TYPES_OP(__name__, __operation1__, __operation2__)                                                 \
     template <typename _KernelNameSpecialization1, typename _KernelNameSpecialization2>                                \
     class __name__##_kernel;                                                                                           \
                                                                                                                        \
@@ -74,16 +74,14 @@
                                                                                                                        \
         deps_out->get_pImpl()->add(event);                                                                             \
         return deps_out;                                                                                               \
-    }
-
-#define MACRO_1ARG_2TYPES_OP(__name__, __operation1__, __operation2__)                                                 \
+    }                                                                                                                  \
+                                                                                                                       \
     template <typename _DataType_input, typename _DataType_output>                                                     \
     Deps* __name__(void* array1_in, void* result1, size_t size)                                                        \
     {                                                                                                                  \
         return __name__<_DataType_input, _DataType_output>(array1_in, result1, size, new Deps());                      \
     }
 
-#include <dpnp_gen_1arg_2type_async_tbl.hpp>
 #include <dpnp_gen_1arg_2type_tbl.hpp>
 
 template Deps* dpnp_acos_c<int, double>(void*, void*, size_t, Deps*);
@@ -513,7 +511,7 @@ static void func_map_init_elemwise_1arg_2type(func_map_t& fmap)
     return;
 }
 
-#define MACRO_1ARG_1TYPE_ASYNC_OP(__name__, __operation1__, __operation2__)                                            \
+#define MACRO_1ARG_1TYPE_OP(__name__, __operation1__, __operation2__)                                                  \
     template <typename _KernelNameSpecialization>                                                                      \
     class __name__##_kernel;                                                                                           \
                                                                                                                        \
@@ -556,16 +554,13 @@ static void func_map_init_elemwise_1arg_2type(func_map_t& fmap)
                                                                                                                        \
         deps_out->get_pImpl()->add(event);                                                                             \
         return deps_out;                                                                                               \
-    }
-
-#define MACRO_1ARG_1TYPE_OP(__name__, __operation1__, __operation2__)                                                  \
+    }                                                                                                                  \
     template <typename _DataType>                                                                                      \
     Deps* __name__(void* array1_in, void* result1, size_t size)                                                        \
     {                                                                                                                  \
         return __name__<_DataType>(array1_in, result1, size, new Deps());                                              \
     }
 
-#include <dpnp_gen_1arg_1type_async_tbl.hpp>
 #include <dpnp_gen_1arg_1type_tbl.hpp>
 
 template Deps* dpnp_conjugate_c<std::complex<double>>(void*, void*, size_t, Deps*);
@@ -675,7 +670,7 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
     return;
 }
 
-#define MACRO_2ARG_3TYPES_ASYNC_OP(__name__, __operation1__, __operation2__)                                           \
+#define  MACRO_2ARG_3TYPES_OP(__name__, __operation1__, __operation2__)                                                \
     template <typename _KernelNameSpecialization1,                                                                     \
               typename _KernelNameSpecialization2,                                                                     \
               typename _KernelNameSpecialization3>                                                                     \
@@ -726,7 +721,6 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
         new (input2_it) DPNPC_id<_DataType_input2>(input2_data, input2_shape, input2_shape_ndim);                      \
                                                                                                                        \
         input2_it->broadcast_to_shape(result_shape);                                                                   \
-                                                                                                                       \
         const size_t result_size = input1_it->get_output_size();                                                       \
                                                                                                                        \
         cl::sycl::range<1> gws(result_size);                                                                           \
@@ -761,7 +755,7 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
                 event.wait();                                                                                          \
             }                                                                                                          \
         }                                                                                                              \
-        else if (input1_size == 1 || input2_size == 1)                                                                \
+        else if (input1_size == 1 || input2_size == 1)                                                                 \
         {                                                                                                              \
             cl::sycl::range<1> opt_gws(result_size);                                                                   \
             auto opt_kernel_parallel_for_func = [=](cl::sycl::id<1> global_id) {                                       \
@@ -772,8 +766,7 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
             };                                                                                                         \
             auto opt_kernel_func = [&](cl::sycl::handler& cgh) {                                                       \
                 cgh.depends_on(deps_in->get_pImpl()->get());                                                           \
-                cgh.parallel_for<                                                                                      \
-                    class __name__##_opt_kernel<_DataType_output, _DataType_input1, _DataType_input2>>(                \
+                cgh.parallel_for<class __name__##_opt_kernel<_DataType_output, _DataType_input1, _DataType_input2>>(   \
                     opt_gws, opt_kernel_parallel_for_func);                                                            \
             };                                                                                                         \
             event = DPNP_QUEUE.submit(opt_kernel_func);                                                                \
@@ -788,9 +781,8 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
         input1_it->~DPNPC_id();                                                                                        \
         input2_it->~DPNPC_id();                                                                                        \
         return deps_out;                                                                                               \
-    }
-
-#define MACRO_2ARG_3TYPES_OP(__name__, __operation1__, __operation2__)                                                 \
+    }                                                                                                                  \
+                                                                                                                       \
     template <typename _DataType_output, typename _DataType_input1, typename _DataType_input2>                         \
     Deps* __name__(void* result_out,                                                                                   \
                    const void* input1_in,                                                                              \
@@ -816,7 +808,6 @@ static void func_map_init_elemwise_1arg_1type(func_map_t& fmap)
                                                                               new Deps());                             \
     }
 
-#include <dpnp_gen_2arg_3type_async_tbl.hpp>
 #include <dpnp_gen_2arg_3type_tbl.hpp>
 
 template Deps* dpnp_add_c<int, int, int>(void*,
