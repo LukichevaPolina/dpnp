@@ -85,18 +85,15 @@ cpdef tuple dpnp_diag_indices(n, ndim):
     
     res_list = []
     cdef utils.dpnp_descriptor res_arr
-    cdef shape_type_c result_shape 
+    cdef shape_type_c result_shape =  utils._object_to_tuple(res_size)
     for i in range(ndim):
-        result_shape = utils._object_to_tuple(n)
         res_arr = utils.create_output_descriptor(result_shape, kernel_data.return_type, None)
 
-        func(res_arr.get_data(), n)
+        func(res_arr.get_data(), res_size)
 
         res_list.append(res_arr.get_pyobj())
-
-    result = tuple(res_list)
  
-    return result
+    return tuple(res_list)
 
 cpdef utils.dpnp_descriptor dpnp_diagonal(dpnp_descriptor input, offset=0):
     cdef shape_type_c input_shape = input.shape
