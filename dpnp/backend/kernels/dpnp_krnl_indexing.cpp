@@ -39,7 +39,6 @@ template <typename _DataType>
 void dpnp_diag_indices_c(void* result1, size_t size)
 {
     dpnp_arange_c<_DataType>(0, 1, result1, size);
-    for<class dpnp_diag_indices_c_kernel<_DataType>>(gws, kernel_parallel_for_func);
 }
 
 template <typename _DataType>
