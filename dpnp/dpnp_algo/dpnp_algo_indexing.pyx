@@ -75,8 +75,7 @@ cpdef utils.dpnp_descriptor dpnp_choose(object input, list choices):
 
 
 cpdef tuple dpnp_diag_indices(n, ndim):
-    if n < 0:
-        n = 0
+    cdef size_t res_size = 0 if n < 0 else n
 
     cdef DPNPFuncType param1_type = dpnp_dtype_to_DPNPFuncType(dpnp.int64)
 
