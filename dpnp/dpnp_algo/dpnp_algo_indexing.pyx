@@ -85,7 +85,7 @@ cpdef tuple dpnp_diag_indices(n, ndim):
     
     res_list = []
     cdef utils.dpnp_descriptor res_arr
-    cdef shape_type_c result_shape =  utils._object_to_tuple(res_size)
+    cdef shape_type_c result_shape = utils._object_to_tuple(res_size)
     for i in range(ndim):
         res_arr = utils.create_output_descriptor(result_shape, kernel_data.return_type, None)
 
