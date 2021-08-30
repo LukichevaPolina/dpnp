@@ -385,7 +385,7 @@
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s1">&#39;valid&#39;</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">dpnp_correlate</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">x2_desc</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dpnp_correlate</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">x2_desc</span><span class="p">)</span><span class="o">.</span><span class="n">get_pyobj</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">call_origin</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">correlate</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span></div>
 
@@ -445,7 +445,11 @@
         <span class="k">elif</span> <span class="n">aweights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">dpnp_cov</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x1_desc</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">dpnp</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+                <span class="n">x1_double_container</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dpnp</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+                <span class="n">x1_desc</span> <span class="o">=</span> <span class="n">dpnp</span><span class="o">.</span><span class="n">get_dpnp_descriptor</span><span class="p">(</span><span class="n">x1_double_container</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">dpnp_cov</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">)</span><span class="o">.</span><span class="n">get_pyobj</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">call_origin</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">cov</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">rowvar</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">ddof</span><span class="p">,</span> <span class="n">fweights</span><span class="p">,</span> <span class="n">aweights</span><span class="p">)</span></div>
 
@@ -534,7 +538,7 @@
         <span class="k">elif</span> <span class="n">where</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_max</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_max</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span><span class="o">.</span><span class="n">get_pyobj</span><span class="p">()</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">dpnp</span><span class="o">.</span><span class="n">convert_single_elem_array_to_scalar</span><span class="p">(</span><span class="n">result_obj</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">result</span>
@@ -582,7 +586,7 @@
         <span class="k">if</span> <span class="n">x1_desc</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_mean</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_mean</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">dpnp</span><span class="o">.</span><span class="n">convert_single_elem_array_to_scalar</span><span class="p">(</span><span class="n">result_obj</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">result</span>
@@ -632,7 +636,7 @@
         <span class="k">elif</span> <span class="n">keepdims</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_median</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">)</span>
+            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_median</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">)</span><span class="o">.</span><span class="n">get_pyobj</span><span class="p">()</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">dpnp</span><span class="o">.</span><span class="n">convert_single_elem_array_to_scalar</span><span class="p">(</span><span class="n">result_obj</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">result</span>
@@ -675,7 +679,7 @@
         <span class="k">elif</span> <span class="n">where</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_min</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_min</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">axis</span><span class="p">)</span><span class="o">.</span><span class="n">get_pyobj</span><span class="p">()</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">dpnp</span><span class="o">.</span><span class="n">convert_single_elem_array_to_scalar</span><span class="p">(</span><span class="n">result_obj</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">result</span>
@@ -712,7 +716,7 @@
         <span class="k">elif</span> <span class="n">keepdims</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_nanvar</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">ddof</span><span class="p">)</span>
+            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_nanvar</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">ddof</span><span class="p">)</span><span class="o">.</span><span class="n">get_pyobj</span><span class="p">()</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">dpnp</span><span class="o">.</span><span class="n">convert_single_elem_array_to_scalar</span><span class="p">(</span><span class="n">result_obj</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">result</span>
@@ -770,7 +774,7 @@
         <span class="k">elif</span> <span class="n">keepdims</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_std</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">ddof</span><span class="p">)</span>
+            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_std</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">ddof</span><span class="p">)</span><span class="o">.</span><span class="n">get_pyobj</span><span class="p">()</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">dpnp</span><span class="o">.</span><span class="n">convert_single_elem_array_to_scalar</span><span class="p">(</span><span class="n">result_obj</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">result</span>
@@ -828,7 +832,7 @@
         <span class="k">elif</span> <span class="n">keepdims</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_var</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">ddof</span><span class="p">)</span>
+            <span class="n">result_obj</span> <span class="o">=</span> <span class="n">dpnp_var</span><span class="p">(</span><span class="n">x1_desc</span><span class="p">,</span> <span class="n">ddof</span><span class="p">)</span><span class="o">.</span><span class="n">get_pyobj</span><span class="p">()</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">dpnp</span><span class="o">.</span><span class="n">convert_single_elem_array_to_scalar</span><span class="p">(</span><span class="n">result_obj</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">result</span>
