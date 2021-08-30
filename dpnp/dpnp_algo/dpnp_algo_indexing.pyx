@@ -55,8 +55,8 @@ __all__ += [
 ]
 
 ctypedef void(*fptr_dpnp_diag_indices)(void*, size_t)
-ctypedef void(*custom_indexing_2in_1out_func_ptr_t)(void *, void * , void * , size_t)
-ctypedef void(*custom_indexing_2in_1out_func_ptr_t_)(void * , void * , const size_t, size_t * , size_t * , const size_t)
+ctypedef void(*custom_indexing_2in_1out_func_ptr_t)(void *, const size_t, void * , void * , size_t)
+ctypedef void(*custom_indexing_2in_1out_func_ptr_t_)(void * , const size_t, void * , const size_t, size_t * , size_t * , const size_t)
 ctypedef void(*custom_indexing_2in_func_ptr_t)(void *, void * , size_t * , const size_t)
 ctypedef void(*custom_indexing_3in_func_ptr_t)(void * , void * , void * , const size_t, const size_t)
 ctypedef void(*custom_indexing_3in_with_axis_func_ptr_t)(void * , void * , void * , const size_t, size_t * , const size_t,
