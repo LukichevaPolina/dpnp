@@ -81,7 +81,11 @@ def choose(x1, choices, out=None, mode='raise'):
     --------
     :obj:`take_along_axis` : Preferable if choices is an array.
     """
-    if not use_origin_backend(x1):
+    x1 = dpnp.array(x1)
+    x1_desc = dpnp.get_dpnp_descriptor(x1)
+    choices = dpnp.array(choices)
+    choices_desc = dpnp.get_dpnp_descriptor(choices)
+    if x1_desc and choices_desc:
         if not isinstance(x1, list):
             pass
         elif not isinstance(choices, list):
@@ -109,7 +113,7 @@ def choose(x1, choices, out=None, mode='raise'):
                 if not val:
                     pass
                 else:
-                    return dpnp_choose(x1, choices).get_pyobj()
+                    return dpnp_choose(x1_desc, choices_desc).get_pyobj()
 
     return call_origin(numpy.choose, x1, choices, out, mode)
 

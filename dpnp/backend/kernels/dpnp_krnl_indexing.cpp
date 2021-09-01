@@ -32,6 +32,33 @@
 #include "dpnpc_memory_adapter.hpp"
 #include "queue_sycl.hpp"
 
+template <typename _DataType1, typename _DataType2>
+class dpnp_choose_c_kernel;
+
+template <typename _DataType1, typename _DataType2>
+void dpnp_choose_c(
+    void* array1_in, const size_t input1_size, void* choices1, void* result1, const size_t size)
+{
+    DPNPC_ptr_adapter<_DataType1> input1_ptr(array1_in, size);
+    DPNPC_ptr_adapter<_DataType2> choices_ptr(choices1, input1_size*size);
+    _DataType1* array_in = input1_ptr.get_ptr();
+    _DataType2* choices = choices_ptr.get_ptr();
+    _DataType2* result = reinterpret_cast<_DataType2*>(result1);
+
+    cl::sycl::range<1> gws(size);
+    auto kernel_parallel_for_func = [=](cl::sycl::id<1> global_id) {
+        const size_t idx = global_id[0];
+        result[idx] = choices[array_in[idx]*size + idx];
+    };
+
+    auto kernel_func = [&](cl::sycl::handler& cgh) {
+        cgh.parallel_for<class dpnp_choose_c_kernel<_DataType1, _DataType2>>(gws, kernel_parallel_for_func);
+    };
+
+    cl::sycl::event event = DPNP_QUEUE.submit(kernel_func);
+    event.wait();
+}
+
 template <typename _DataType>
 class dpnp_diagonal_c_kernel;
 
@@ -503,6 +530,11 @@ void dpnp_take_c(void* array1_in, const size_t array1_size, void* indices1, void
 
 void func_map_init_indexing_func(func_map_t& fmap)
 {
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_choose_c<int, int>};
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_choose_c<int, long>};
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_choose_c<int, float>};
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_choose_c<int, double>};
+
     fmap[DPNPFuncName::DPNP_FN_DIAGONAL][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_diagonal_c<int>};
     fmap[DPNPFuncName::DPNP_FN_DIAGONAL][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_diagonal_c<long>};
     fmap[DPNPFuncName::DPNP_FN_DIAGONAL][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_diagonal_c<float>};
