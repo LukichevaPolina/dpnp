@@ -37,10 +37,10 @@ class dpnp_choose_c_kernel;
 
 template <typename _DataType1, typename _DataType2>
 void dpnp_choose_c(
-    void* array1_in, const size_t input1_size, void* choices1, void* result1, const size_t size)
+    void* array1_in, const size_t choices_size, void* choices1, void* result1, const size_t size)
 {
     DPNPC_ptr_adapter<_DataType1> input1_ptr(array1_in, size);
-    DPNPC_ptr_adapter<_DataType2> choices_ptr(choices1, input1_size*size);
+    DPNPC_ptr_adapter<_DataType2> choices_ptr(choices1, choices_size*size);
     _DataType1* array_in = input1_ptr.get_ptr();
     _DataType2* choices = choices_ptr.get_ptr();
     _DataType2* result = reinterpret_cast<_DataType2*>(result1);
