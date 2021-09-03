@@ -37,8 +37,7 @@ template <typename _DataType1, typename _DataType2>
 class dpnp_choose_c_kernel;
 
 template <typename _DataType1, typename _DataType2>
-void dpnp_choose_c(
-    void* result1, void* array1_in, std::list<void*> choices1, size_t size)
+void dpnp_choose_c(void* result1, void* array1_in, std::list<void*> choices1, size_t size)
 {
     DPNPC_ptr_adapter<_DataType1> input1_ptr(array1_in, size);
     _DataType1* array_in = input1_ptr.get_ptr();
