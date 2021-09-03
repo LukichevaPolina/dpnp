@@ -26,6 +26,7 @@
 #include <iostream>
 #include <list>
 #include <vector>
+#include <list>
 
 #include <dpnp_iface.hpp>
 #include "dpnp_fptr.hpp"
@@ -37,18 +38,24 @@ class dpnp_choose_c_kernel;
 
 template <typename _DataType1, typename _DataType2>
 void dpnp_choose_c(
-    void* array1_in, const size_t choices_size, void* choices1, void* result1, const size_t size)
+    void* result1, void* array1_in, std::list<void*> choices1, size_t size)
 {
     DPNPC_ptr_adapter<_DataType1> input1_ptr(array1_in, size);
-    DPNPC_ptr_adapter<_DataType2> choices_ptr(choices1, choices_size*size);
     _DataType1* array_in = input1_ptr.get_ptr();
-    _DataType2* choices = choices_ptr.get_ptr();
+
+    _DataType2** choices = reinterpret_cast<_DataType2**>(dpnp_memory_alloc_c(sizeof(_DataType2*) * choices1.size()));
+    size_t i = 0;
+    for (auto choice : choices1)
+    {
+        choices[i] = reinterpret_cast<_DataType2*>(choice);
+        ++i;
+    }
     _DataType2* result = reinterpret_cast<_DataType2*>(result1);
 
     cl::sycl::range<1> gws(size);
     auto kernel_parallel_for_func = [=](cl::sycl::id<1> global_id) {
         const size_t idx = global_id[0];
-        result[idx] = choices[array_in[idx]*size + idx];
+        result[idx] = choices[array_in[idx]][idx];
     };
 
     auto kernel_func = [&](cl::sycl::handler& cgh) {
@@ -531,9 +538,13 @@ void dpnp_take_c(void* array1_in, const size_t array1_size, void* indices1, void
 void func_map_init_indexing_func(func_map_t& fmap)
 {
     fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_choose_c<int, int>};
-    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_choose_c<int, long>};
-    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_choose_c<int, float>};
-    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_choose_c<int, double>};
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_INT][eft_LNG] = {eft_LNG, (void*)dpnp_choose_c<int, long>};
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_INT][eft_FLT] = {eft_FLT, (void*)dpnp_choose_c<int, float>};
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_INT][eft_DBL] = {eft_DBL, (void*)dpnp_choose_c<int, double>};
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_LNG][eft_INT] = {eft_INT, (void*)dpnp_choose_c<long, int>};
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_choose_c<long, long>};
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_LNG][eft_FLT] = {eft_FLT, (void*)dpnp_choose_c<long, float>};
+    fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_LNG][eft_DBL] = {eft_DBL, (void*)dpnp_choose_c<long, double>};
 
     fmap[DPNPFuncName::DPNP_FN_DIAGONAL][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_diagonal_c<int>};
     fmap[DPNPFuncName::DPNP_FN_DIAGONAL][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_diagonal_c<long>};

@@ -81,23 +81,25 @@ def choose(x1, choices, out=None, mode='raise'):
     --------
     :obj:`take_along_axis` : Preferable if choices is an array.
     """
-    x1 = dpnp.array(x1)
     x1_desc = dpnp.get_dpnp_descriptor(x1)
-    choices = dpnp.array(choices)
-    choices_desc = dpnp.get_dpnp_descriptor(choices)
-    if x1_desc and choices_desc:
-        if not isinstance(x1, list):
-            pass
-        elif not isinstance(choices, list):
+
+    choices_list =[]
+    for choice in choices:
+        choices_list.append(dpnp.get_dpnp_descriptor(choice))
+
+    if x1_desc:
+        if any(not desc for desc in choices_list):
             pass
         elif out is not None:
             pass
         elif mode != 'raise':
             pass
+        elif any(not choices[0].dtype == choice.dtype for choice in choices):
+            pass
         else:
             val = True
             len_ = len(x1)
-            size_ = choices[0].size
+            size_ = choices_list[0].size
             for i in range(len(choices)):
                 if choices[i].size != size_ or choices[i].size != len_:
                     val = False
@@ -113,7 +115,7 @@ def choose(x1, choices, out=None, mode='raise'):
                 if not val:
                     pass
                 else:
-                    return dpnp_choose(x1_desc, choices_desc).get_pyobj()
+                    return dpnp_choose(x1_desc, choices_list).get_pyobj()
 
     return call_origin(numpy.choose, x1, choices, out, mode)
 

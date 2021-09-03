@@ -41,6 +41,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <list>
 
 #include "dpnp_iface_fft.hpp"
 #include "dpnp_iface_random.hpp"
@@ -568,14 +569,13 @@ INP_DLLEXPORT void dpnp_det_c(void* array1_in, void* result1, size_t* shape, siz
  * @ingroup BACKEND_API
  * @brief math library implementation of take function
  *
- * @param [in]  array         Input array with data.
- * @param [in]  array1_size   Choices array size.
- * @param [in]  choices       Choice arrays.
  * @param [out] result        Output array.
+ * @param [in]  array         Input array with data.
+ * @param [in]  choices       Choice arrays.
  * @param [in]  size          Input array size.
  */
-template <typename _DataType, typename _IndecesType>
-INP_DLLEXPORT void dpnp_choose_c(void* array, const size_t array1_size, void* choices, void* result, size_t size);
+template <typename _DataType1, typename _DataType2>
+INP_DLLEXPORT void dpnp_choose_c(void* result1, void* array1_in, std::list<void*> choices, size_t size);
 
 /**
  * @ingroup BACKEND_API
