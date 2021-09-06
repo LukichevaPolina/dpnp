@@ -41,7 +41,6 @@
 
 #include <cstdint>
 #include <vector>
-#include <list>
 
 #include "dpnp_iface_fft.hpp"
 #include "dpnp_iface_random.hpp"
@@ -575,7 +574,7 @@ INP_DLLEXPORT void dpnp_det_c(void* array1_in, void* result1, size_t* shape, siz
  * @param [in]  size          Input array size.
  */
 template <typename _DataType1, typename _DataType2>
-INP_DLLEXPORT void dpnp_choose_c(void* result1, void* array1_in, std::list<void*> choices, size_t size);
+INP_DLLEXPORT void dpnp_choose_c(void* result1, void* array1_in, std::vector<void*> choices, size_t size);
 
 /**
  * @ingroup BACKEND_API

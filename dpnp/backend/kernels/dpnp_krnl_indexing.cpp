@@ -37,24 +37,21 @@ template <typename _DataType1, typename _DataType2>
 class dpnp_choose_c_kernel;
 
 template <typename _DataType1, typename _DataType2>
-void dpnp_choose_c(void* result1, void* array1_in, std::list<void*> choices1, size_t size)
+void dpnp_choose_c(void* result1, void* array1_in, std::vector<void*> choices1, size_t size)
 {
     DPNPC_ptr_adapter<_DataType1> input1_ptr(array1_in, size);
     _DataType1* array_in = input1_ptr.get_ptr();
 
-    _DataType2** choices = reinterpret_cast<_DataType2**>(dpnp_memory_alloc_c(sizeof(_DataType2*) * choices1.size()));
-    size_t i = 0;
-    for (auto choice : choices1)
-    {
-        choices[i] = reinterpret_cast<_DataType2*>(choice);
-        ++i;
-    }
-    _DataType2* result = reinterpret_cast<_DataType2*>(result1);
+    DPNPC_ptr_adapter<_DataType2*> choices_ptr(choices1.data(), choices1.size());
+    _DataType2** ch = choices_ptr.get_ptr();
+
+    DPNPC_ptr_adapter<_DataType2> result1_ptr(result1, size, false, true);
+    _DataType2* result = result1_ptr.get_ptr();
 
     cl::sycl::range<1> gws(size);
     auto kernel_parallel_for_func = [=](cl::sycl::id<1> global_id) {
         const size_t idx = global_id[0];
-        result[idx] = choices[array_in[idx]][idx];
+        result[idx] = ch[array_in[idx]][idx];
     };
 
     auto kernel_func = [&](cl::sycl::handler& cgh) {

@@ -54,7 +54,7 @@ __all__ += [
     "dpnp_triu_indices_from"
 ]
 
-ctypedef void(*fptr_dpnp_choose_t)(void * , void * , list_cpp[void *], size_t *)
+ctypedef void(*fptr_dpnp_choose_t)(void * , void * , vector[void *], size_t *)
 ctypedef void(*custom_indexing_2in_1out_func_ptr_t)(void *, const size_t, void * , void * , size_t)
 ctypedef void(*custom_indexing_2in_1out_func_ptr_t_)(void * , const size_t, void * , const size_t, size_t * , size_t * , const size_t)
 ctypedef void(*custom_indexing_2in_func_ptr_t)(void *, void * , size_t * , const size_t)
@@ -68,7 +68,7 @@ ctypedef void(*fptr_dpnp_nonzero_t)(const void * , void * , const size_t, const 
 cpdef utils.dpnp_descriptor dpnp_choose(utils.dpnp_descriptor input, list choices1):
     cdef shape_type_c input_shape = input.shape  
 
-    cdef list_cpp[void * ] choices
+    cdef vector[void * ] choices
     cdef utils.dpnp_descriptor choice
     for desc in choices1:
         choice = desc
