@@ -43,7 +43,7 @@ void dpnp_choose_c(void* result1, void* array1_in, std::vector<void*> choices1, 
     _DataType1* array_in = input1_ptr.get_ptr();
 
     DPNPC_ptr_adapter<_DataType2*> choices_ptr(choices1.data(), choices1.size());
-    _DataType2** ch = choices_ptr.get_ptr();
+    _DataType2** choices = choices_ptr.get_ptr();
 
     DPNPC_ptr_adapter<_DataType2> result1_ptr(result1, size, false, true);
     _DataType2* result = result1_ptr.get_ptr();
