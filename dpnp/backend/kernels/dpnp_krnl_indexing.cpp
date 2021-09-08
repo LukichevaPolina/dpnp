@@ -67,6 +67,15 @@ void dpnp_choose_c(void* result1, void* array1_in, std::vector<void*> choices1, 
 }
 
 template <typename _DataType>
+class dpnp_diag_indices_c_kernel;
+
+template <typename _DataType>
+void dpnp_diag_indices_c(void* result1, size_t size)
+{
+    dpnp_arange_c<_DataType>(0, 1, result1, size);
+}
+
+template <typename _DataType>
 class dpnp_diagonal_c_kernel;
 
 template <typename _DataType>
@@ -545,6 +554,11 @@ void func_map_init_indexing_func(func_map_t& fmap)
     fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_choose_c<long, long>};
     fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_LNG][eft_FLT] = {eft_FLT, (void*)dpnp_choose_c<long, float>};
     fmap[DPNPFuncName::DPNP_FN_CHOOSE][eft_LNG][eft_DBL] = {eft_DBL, (void*)dpnp_choose_c<long, double>};
+
+    fmap[DPNPFuncName::DPNP_FN_DIAG_INDICES][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_diag_indices_c<int>};
+    fmap[DPNPFuncName::DPNP_FN_DIAG_INDICES][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_diag_indices_c<long>};
+    fmap[DPNPFuncName::DPNP_FN_DIAG_INDICES][eft_FLT][eft_FLT] = {eft_FLT, (void*)dpnp_diag_indices_c<float>};
+    fmap[DPNPFuncName::DPNP_FN_DIAG_INDICES][eft_DBL][eft_DBL] = {eft_DBL, (void*)dpnp_diag_indices_c<double>};
 
     fmap[DPNPFuncName::DPNP_FN_DIAGONAL][eft_INT][eft_INT] = {eft_INT, (void*)dpnp_diagonal_c<int>};
     fmap[DPNPFuncName::DPNP_FN_DIAGONAL][eft_LNG][eft_LNG] = {eft_LNG, (void*)dpnp_diagonal_c<long>};
