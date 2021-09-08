@@ -39,7 +39,7 @@ class dpnp_choose_c_kernel;
 template <typename _DataType1, typename _DataType2>
 void dpnp_choose_c(void* result1, void* array1_in, std::vector<void*> choices1, size_t size)
 {
-    if ((array1_in == nullptr) || (result1 == nullptr) || !size)
+    if ((array1_in == nullptr) || (result1 == nullptr) || !choices1.size() || !size)
     {
         return;
     }
