@@ -496,6 +496,10 @@ template&lt;typename _DataType &gt; </td></tr>
 <tr class="memitem:gadc2a99736d4cc07bcfe1b7ca77ba655a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___b_a_c_k_e_n_d___a_p_i.html#gadc2a99736d4cc07bcfe1b7ca77ba655a">dpnp_diag_c</a> (void *array, void *result, const int k, size_t *shape, size_t *res_shape, const size_t ndim, const size_t res_ndim)</td></tr>
 <tr class="memdesc:gadc2a99736d4cc07bcfe1b7ca77ba655a"><td class="mdescLeft">&#160;</td><td class="mdescRight">math library implementation of det function  <a href="group___b_a_c_k_e_n_d___a_p_i.html#gadc2a99736d4cc07bcfe1b7ca77ba655a">More...</a><br /></td></tr>
 <tr class="separator:gadc2a99736d4cc07bcfe1b7ca77ba655a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga62633baa2adbf3a416319284be06fad2"><td class="memTemplParams" colspan="2">template&lt;typename _DataType &gt; </td></tr>
+<tr class="memitem:ga62633baa2adbf3a416319284be06fad2"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___b_a_c_k_e_n_d___a_p_i.html#ga62633baa2adbf3a416319284be06fad2">dpnp_diag_indices_c</a> (void *result1, size_t size)</td></tr>
+<tr class="memdesc:ga62633baa2adbf3a416319284be06fad2"><td class="mdescLeft">&#160;</td><td class="mdescRight">math library implementation of diagonal function  <a href="group___b_a_c_k_e_n_d___a_p_i.html#ga62633baa2adbf3a416319284be06fad2">More...</a><br /></td></tr>
+<tr class="separator:ga62633baa2adbf3a416319284be06fad2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6b10b788861642f1c713ec7045f95782"><td class="memTemplParams" colspan="2">template&lt;typename _DataType &gt; </td></tr>
 <tr class="memitem:ga6b10b788861642f1c713ec7045f95782"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group___b_a_c_k_e_n_d___a_p_i.html#ga6b10b788861642f1c713ec7045f95782">dpnp_diagonal_c</a> (void *array1_in, const size_t input1_size, void *result1, const size_t offset, size_t *shape, size_t *res_shape, const size_t res_ndim)</td></tr>
 <tr class="memdesc:ga6b10b788861642f1c713ec7045f95782"><td class="mdescLeft">&#160;</td><td class="mdescRight">math library implementation of diagonal function  <a href="group___b_a_c_k_e_n_d___a_p_i.html#ga6b10b788861642f1c713ec7045f95782">More...</a><br /></td></tr>
@@ -634,6 +638,9 @@ template&lt;typename _DataType &gt; </td></tr>
 <tr class="memitem:gaa4be84f68fb1e6f7a0706e22378d54e0"><td class="memItemLeft" align="right" valign="top">INP_DLLEXPORT void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___b_a_c_k_e_n_d___a_p_i.html#gaa4be84f68fb1e6f7a0706e22378d54e0">get_dpnp_function_ptr1</a> (<a class="el" href="group___b_a_c_k_e_n_d___f_u_n_c___p_t_r___a_p_i.html#gaec54569b58e937e84099479f078bce15">DPNPFuncType</a> &amp;result_type, <a class="el" href="group___b_a_c_k_e_n_d___f_u_n_c___p_t_r___a_p_i.html#ga8b20590525bff7c7ce4f728d2021b558">DPNPFuncName</a> name, <a class="el" href="group___b_a_c_k_e_n_d___f_u_n_c___p_t_r___a_p_i.html#gaec54569b58e937e84099479f078bce15">DPNPFuncType</a> first_type, <a class="el" href="group___b_a_c_k_e_n_d___f_u_n_c___p_t_r___a_p_i.html#gaec54569b58e937e84099479f078bce15">DPNPFuncType</a> second_type=<a class="el" href="group___b_a_c_k_e_n_d___f_u_n_c___p_t_r___a_p_i.html#ggaec54569b58e937e84099479f078bce15a4dd2e447249c9f1ed5b4a01263bd8d06">DPNPFuncType::DPNP_FT_NONE</a>)</td></tr>
 <tr class="memdesc:gaa4be84f68fb1e6f7a0706e22378d54e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">get runtime pointer to selected function  <a href="group___b_a_c_k_e_n_d___a_p_i.html#gaa4be84f68fb1e6f7a0706e22378d54e0">More...</a><br /></td></tr>
 <tr class="separator:gaa4be84f68fb1e6f7a0706e22378d54e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4e191231edc850c6882379230ecec168"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___b_a_c_k_e_n_d___a_p_i.html#ga4e191231edc850c6882379230ecec168">dpnp_python_constants_initialize_c</a> (void *py_none, void *py_nan)</td></tr>
+<tr class="memdesc:ga4e191231edc850c6882379230ecec168"><td class="mdescLeft">&#160;</td><td class="mdescRight">Python constants initialization in the backend.  <a href="group___b_a_c_k_e_n_d___a_p_i.html#ga4e191231edc850c6882379230ecec168">More...</a><br /></td></tr>
+<tr class="separator:ga4e191231edc850c6882379230ecec168"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>This section describes Backend API. </p>
@@ -2774,6 +2781,45 @@ template&lt;typename _DataType &gt; </div>
     <tr><td class="paramdir">[in]</td><td class="paramname">shape</td><td>Shape of input array. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">shape_result</td><td>Shape of result array. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">ndim</td><td>Number of elements in shape. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga62633baa2adbf3a416319284be06fad2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga62633baa2adbf3a416319284be06fad2">&#9670;&nbsp;</a></span>dpnp_diag_indices_c()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename _DataType &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void dpnp_diag_indices_c </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>result1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>math library implementation of diagonal function </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">result</td><td>Output array. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>Size of array. </td></tr>
   </table>
   </dd>
 </dl>
@@ -5646,6 +5692,44 @@ template&lt;typename _DataType , typename _IndecesType , typename _ValueType &gt
     <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>Number of input elements in <code>array</code>. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">size_ind</td><td>Number of input elements in <code>ind</code>. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">size_v</td><td>Number of input elements in <code>v</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ga4e191231edc850c6882379230ecec168"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga4e191231edc850c6882379230ecec168">&#9670;&nbsp;</a></span>dpnp_python_constants_initialize_c()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dpnp_python_constants_initialize_c </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>py_none</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>py_nan</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Python constants initialization in the backend. </p>
+<p>Global values from Python to use in algorithms.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">py_none</td><td>Python NONE representation </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">py_nan</td><td>Python NAN representation </td></tr>
   </table>
   </dd>
 </dl>
