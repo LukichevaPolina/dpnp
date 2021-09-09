@@ -97,11 +97,11 @@ def choose(x1, choices, out=None, mode='raise'):
         elif any(not choices[0].dtype == choice.dtype for choice in choices):
             pass
         else:
-            len_ = x1_desc.size
-            size_ = choices_list[0].size
-            if any(choice.size != size_ or choice.size != len_ for choice in choices):
+            size = x1_desc.size
+            choices_size = choices_list[0].size
+            if any(choice.size != choices_size or choice.size != size for choice in choices):
                 pass
-            elif any(x >= size_ for x in dpnp.asnumpy(x1)):
+            elif any(x >= choices_size for x in dpnp.asnumpy(x1)):
                 pass
             else:
                 return dpnp_choose(x1_desc, choices_list).get_pyobj()
