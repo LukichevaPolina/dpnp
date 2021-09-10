@@ -87,8 +87,6 @@ def choose(x1, choices, out=None, mode='raise'):
     for choice in choices:
         choices_list.append(dpnp.get_dpnp_descriptor(choice))
 
-    size = x1_desc.size
-    choices_size = choices_list[0].size
     if x1_desc:
         if any(not desc for desc in choices_list):
             pass
@@ -98,12 +96,15 @@ def choose(x1, choices, out=None, mode='raise'):
             pass
         elif any(not choices[0].dtype == choice.dtype for choice in choices):
             pass
-        elif any(choice.size != choices_size or choice.size != size for choice in choices):
-            pass
-        elif any(x >= choices_size for x in dpnp.asnumpy(x1)):
-            pass
         else:
-            return dpnp_choose(x1_desc, choices_list).get_pyobj()
+            size = x1_desc.size
+            choices_size = choices_list[0].size
+            if any(choice.size != choices_size or choice.size != size for choice in choices):
+                pass
+            elif any(x >= choices_size for x in dpnp.asnumpy(x1)):
+                pass
+            else:
+                return dpnp_choose(x1_desc, choices_list).get_pyobj()
 
     return call_origin(numpy.choose, x1, choices, out, mode)
 

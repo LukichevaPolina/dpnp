@@ -54,7 +54,7 @@ __all__ += [
     "dpnp_triu_indices_from"
 ]
 
-ctypedef void(*fptr_dpnp_choose_t)(void * , void * , vector[void *], size_t *)
+ctypedef void(*fptr_dpnp_choose_t)(void * , void * , void * *, size_t *,  size_t *)
 ctypedef void(*fptr_dpnp_diag_indices)(void*, size_t)
 ctypedef void(*custom_indexing_2in_1out_func_ptr_t)(void *, const size_t, void * , void * , size_t)
 ctypedef void(*custom_indexing_2in_1out_func_ptr_t_)(void * , const size_t, void * , const size_t, size_t * , size_t * , const size_t)
@@ -85,7 +85,7 @@ cpdef utils.dpnp_descriptor dpnp_choose(utils.dpnp_descriptor input, list choice
 
     cdef fptr_dpnp_choose_t func = <fptr_dpnp_choose_t> kernel_data.ptr
 
-    func(res_array.get_data(), input.get_data(), choices, < size_t * > input_shape[0])
+    func(res_array.get_data(), input.get_data(), choices.data(),< size_t * > choices.size(), < size_t * > input_shape[0])
 
     return res_array
 

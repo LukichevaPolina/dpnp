@@ -37,17 +37,21 @@ template <typename _DataType1, typename _DataType2>
 class dpnp_choose_c_kernel;
 
 template <typename _DataType1, typename _DataType2>
-void dpnp_choose_c(void* result1, void* array1_in, std::vector<void*> choices1, size_t size)
+void dpnp_choose_c(void* result1, void* array1_in, void** choices1, size_t choices_size, size_t size)
 {
-    if ((array1_in == nullptr) || (result1 == nullptr) || !choices1.size() || !size)
+    if ((array1_in == nullptr) || (result1 == nullptr) || !choices_size || !size)
     {
         return;
     }
     DPNPC_ptr_adapter<_DataType1> input1_ptr(array1_in, size);
     _DataType1* array_in = input1_ptr.get_ptr();
 
-    DPNPC_ptr_adapter<_DataType2*> choices_ptr(choices1.data(), choices1.size());
+    DPNPC_ptr_adapter<_DataType2*> choices_ptr(choices1, choices_size);
     _DataType2** choices = choices_ptr.get_ptr();
+    for (size_t i = 0; i < choices_size; ++i)
+    {
+        choices[i] = reinterpret_cast<_DataType2*>(choices1[i]);
+    }
 
     DPNPC_ptr_adapter<_DataType2> result1_ptr(result1, size, false, true);
     _DataType2* result = result1_ptr.get_ptr();
