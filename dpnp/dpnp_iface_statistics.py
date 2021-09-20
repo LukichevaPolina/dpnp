@@ -564,7 +564,7 @@ def nanvar(x1, axis=None, dtype=None, out=None, ddof=0, keepdims=False):
             pass
         else:
             result_obj = dpnp_nanvar(x1_desc, ddof).get_pyobj()
-            result = dpnp.convert_single_elem_array_to_scalar(dpnp.asnumpy(result_obj))
+            result = dpnp.convert_single_elem_array_to_scalar(result_obj)
 
             return result
 
