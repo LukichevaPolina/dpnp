@@ -42,7 +42,6 @@ it contains:
 
 import numpy
 
-import dpnp.config as config
 from dpnp.dpnp_algo import *
 from dpnp.dpnp_utils import *
 import dpnp
