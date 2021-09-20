@@ -659,7 +659,6 @@ def logical_and(x1, x2, out=None, **kwargs):
     [False, False]
 
     """
-    
     x1_desc = dpnp.get_dpnp_descriptor(x1)
     x2_desc = dpnp.get_dpnp_descriptor(x2)
     if x1_desc and x2_desc and not kwargs:
