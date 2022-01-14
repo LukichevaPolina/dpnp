@@ -94,9 +94,12 @@ def dot(x1, x2, **kwargs):
     x1_desc = dpnp.get_dpnp_descriptor(x1, copy_when_strides=False)
     x2_desc = dpnp.get_dpnp_descriptor(x2, copy_when_strides=False)
     if x1_desc and x2_desc and not kwargs:
-        # TODO: remove fallback with scalars when muliply backend func will support strides
-        if(x1_desc.ndim == 0 and x2_desc.strides is not None
+        # TODO: remove fallback with scalars when multiply backend func will support strides
+        if (x1_desc.ndim == 0 and x2_desc.strides is not None
                 or x2_desc.ndim == 0 and x1_desc.strides is not None):
+            pass
+        elif (x1_desc.ndim >= 1 and x2_desc.ndim > 1 and x1_desc.shape[-1] != x2_desc.shape[-2]
+                or x2_desc.ndim == 1 and x1_desc.shape[-1] != x2_desc.shape[0]):
             pass
         else:
             return dpnp_dot(x1_desc, x2_desc).get_pyobj()
