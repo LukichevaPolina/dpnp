@@ -47,6 +47,7 @@
     /**                                                                                                              */ \
     /** Function "__name__" executes operator "__operation1__" over each element of the array                        */ \
     /**                                                                                                              */ \
+    /** @param[in]  q_ref           Reference to SYCL queue.                                                         */ \
     /** @param[out] result_out      Output array.                                                                    */ \
     /** @param[in]  result_size     Output array size.                                                               */ \
     /** @param[in]  result_ndim     Number of output array dimensions.                                               */ \
@@ -58,6 +59,22 @@
     /** @param[in]  input1_shape    Input array 1 shape.                                                             */ \
     /** @param[in]  input1_strides  Input array 1 strides.                                                           */ \
     /** @param[in]  where           Where condition.                                                                 */ \
+    /** @param[in]  dep_events_ref  Reference to vector of SYCL events.                                              */ \
+    template <typename _DataType>                                                                                       \
+    DPCTLSyclEventRef __name__(DPCTLSyclQueueRef q_ref,                                                                 \
+                               void* result_out,                                                                        \
+                               const size_t result_size,                                                                \
+                               const size_t result_ndim,                                                                \
+                               const shape_elem_type* result_shape,                                                     \
+                               const shape_elem_type* result_strides,                                                   \
+                               const void* input1_in,                                                                   \
+                               const size_t input1_size,                                                                \
+                               const size_t input1_ndim,                                                                \
+                               const shape_elem_type* input1_shape,                                                     \
+                               const shape_elem_type* input1_strides,                                                   \
+                               const size_t* where,                                                                     \
+                               const DPCTLEventVectorRef dep_events_ref);                                               \
+                                                                                                                        \
     template <typename _DataType>                                                                                       \
     void __name__(void* result_out,                                                                                     \
                   const size_t result_size,                                                                             \
