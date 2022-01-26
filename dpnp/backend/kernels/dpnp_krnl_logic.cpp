@@ -42,8 +42,8 @@ void dpnp_all_c(const void* array1_in, void* result1, const size_t size)
     }
 
     sycl::event event;
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size);
-    DPNPC_ptr_adapter<_ResultType> result1_ptr(result1, 1, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size);
+    DPNPC_ptr_adapter<_ResultType> result1_ptr(DPNP_QUEUE, result1, 1, true, true);
     const _DataType* array_in = input1_ptr.get_ptr();
     _ResultType* result = result1_ptr.get_ptr();
 
@@ -86,9 +86,9 @@ void dpnp_allclose_c(
     }
 
     sycl::event event;
-    DPNPC_ptr_adapter<_DataType1> input1_ptr(array1_in, size);
-    DPNPC_ptr_adapter<_DataType2> input2_ptr(array2_in, size);
-    DPNPC_ptr_adapter<_ResultType> result1_ptr(result1, 1, true, true);
+    DPNPC_ptr_adapter<_DataType1> input1_ptr(DPNP_QUEUE, array1_in, size);
+    DPNPC_ptr_adapter<_DataType2> input2_ptr(DPNP_QUEUE, array2_in, size);
+    DPNPC_ptr_adapter<_ResultType> result1_ptr(DPNP_QUEUE, result1, 1, true, true);
     const _DataType1* array1 = input1_ptr.get_ptr();
     const _DataType2* array2 = input2_ptr.get_ptr();
     _ResultType* result = result1_ptr.get_ptr();
@@ -132,8 +132,8 @@ void dpnp_any_c(const void* array1_in, void* result1, const size_t size)
     }
 
     sycl::event event;
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size);
-    DPNPC_ptr_adapter<_ResultType> result1_ptr(result1, 1, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size);
+    DPNPC_ptr_adapter<_ResultType> result1_ptr(DPNP_QUEUE, result1, 1, true, true);
     const _DataType* array_in = input1_ptr.get_ptr();
     _ResultType* result = result1_ptr.get_ptr();
 

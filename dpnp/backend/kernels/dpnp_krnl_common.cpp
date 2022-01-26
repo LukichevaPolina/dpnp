@@ -44,7 +44,7 @@ template <typename _DataType, typename _ResultType>
 void dpnp_astype_c(const void* array1_in, void* result1, const size_t size)
 {
     sycl::event event;
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size);
     const _DataType* array_in = input1_ptr.get_ptr();
     _ResultType* result = reinterpret_cast<_ResultType*>(result1);
 
@@ -173,8 +173,8 @@ void dpnp_dot_c(void* result_out,
                 const shape_elem_type* input2_shape,
                 const shape_elem_type* input2_strides)
 {
-    DPNPC_ptr_adapter<_DataType_input1> input1_ptr(input1_in, input1_size);
-    DPNPC_ptr_adapter<_DataType_input2> input2_ptr(input2_in, input2_size);
+    DPNPC_ptr_adapter<_DataType_input1> input1_ptr(DPNP_QUEUE, input1_in, input1_size);
+    DPNPC_ptr_adapter<_DataType_input2> input2_ptr(DPNP_QUEUE, input2_in, input2_size);
 
     _DataType_input1* input1 = input1_ptr.get_ptr();
     _DataType_input2* input2 = input2_ptr.get_ptr();
@@ -383,9 +383,9 @@ void dpnp_eig_c(const void* array_in, void* result1, void* result2, size_t size)
     }
 
     sycl::event event;
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array_in, size * size, true);
-    DPNPC_ptr_adapter<_ResultType> result1_ptr(result1, size, true, true);
-    DPNPC_ptr_adapter<_ResultType> result2_ptr(result2, size * size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array_in, size * size, true);
+    DPNPC_ptr_adapter<_ResultType> result1_ptr(DPNP_QUEUE, result1, size, true, true);
+    DPNPC_ptr_adapter<_ResultType> result2_ptr(DPNP_QUEUE, result2, size * size, true, true);
     const _DataType* array = input1_ptr.get_ptr();
     _ResultType* result_val = result1_ptr.get_ptr();
     _ResultType* result_vec = result2_ptr.get_ptr();
@@ -456,8 +456,8 @@ void dpnp_eigvals_c(const void* array_in, void* result1, size_t size)
     }
 
     sycl::event event;
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array_in, size * size, true);
-    DPNPC_ptr_adapter<_ResultType> result1_ptr(result1, size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array_in, size * size, true);
+    DPNPC_ptr_adapter<_ResultType> result1_ptr(DPNP_QUEUE, result1, size, true, true);
     const _DataType* array = input1_ptr.get_ptr();
     _ResultType* result_val = result1_ptr.get_ptr();
 
@@ -509,8 +509,8 @@ void dpnp_initval_c(void* result1, void* value, size_t size)
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> result1_ptr(result1, size);
-    DPNPC_ptr_adapter<_DataType> value_ptr(value, 1);
+    DPNPC_ptr_adapter<_DataType> result1_ptr(DPNP_QUEUE, result1, size);
+    DPNPC_ptr_adapter<_DataType> value_ptr(DPNP_QUEUE, value, 1);
     _DataType* result = result1_ptr.get_ptr();
     _DataType* val = value_ptr.get_ptr();
 
@@ -570,9 +570,9 @@ void dpnp_matmul_c(void* result_out,
     }
 
     sycl::event event;
-    DPNPC_ptr_adapter<_DataType> input1_ptr(input1_in, size_m * size_k);
-    DPNPC_ptr_adapter<_DataType> input2_ptr(input2_in, size_k * size_n);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result_out, size_m * size_n, false, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, input1_in, size_m * size_k);
+    DPNPC_ptr_adapter<_DataType> input2_ptr(DPNP_QUEUE, input2_in, size_k * size_n);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result_out, size_m * size_n, false, true);
     _DataType* array_1 = input1_ptr.get_ptr();
     _DataType* array_2 = input2_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();

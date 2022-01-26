@@ -36,7 +36,7 @@ class dpnp_argmax_c_kernel;
 template <typename _DataType, typename _idx_DataType>
 void dpnp_argmax_c(void* array1_in, void* result1, size_t size)
 {
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size);
     _DataType* array_1 = input1_ptr.get_ptr();
     _idx_DataType* result = reinterpret_cast<_idx_DataType*>(result1);
 
@@ -58,7 +58,7 @@ class dpnp_argmin_c_kernel;
 template <typename _DataType, typename _idx_DataType>
 void dpnp_argmin_c(void* array1_in, void* result1, size_t size)
 {
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size);
     _DataType* array_1 = input1_ptr.get_ptr();
     _idx_DataType* result = reinterpret_cast<_idx_DataType*>(result1);
 
