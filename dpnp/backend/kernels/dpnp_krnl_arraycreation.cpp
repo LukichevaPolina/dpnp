@@ -79,8 +79,8 @@ void dpnp_diag_c(void* v_in,
 
     const size_t input1_size = std::accumulate(shape, shape + ndim, 1, std::multiplies<shape_elem_type>());
     const size_t result_size = std::accumulate(res_shape, res_shape + res_ndim, 1, std::multiplies<shape_elem_type>());
-    DPNPC_ptr_adapter<_DataType> input1_ptr(v_in, input1_size, true);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1, result_size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, v_in, input1_size, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1, result_size, true, true);
     _DataType* v = input1_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();
 
@@ -121,7 +121,7 @@ void dpnp_eye_c(void* result1, int k, const shape_elem_type* res_shape)
 
     size_t result_size = res_shape[0] * res_shape[1];
 
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1, result_size, true, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1, result_size, true, true);
     _DataType* result = result_ptr.get_ptr();
 
     int diag_val_;
@@ -238,8 +238,8 @@ void dpnp_ptp_c(void* result1_out,
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(input1_in, input_size, true);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1_out, result_size, false, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, input1_in, input_size, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1_out, result_size, false, true);
     _DataType* arr = input1_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();
 
@@ -283,8 +283,8 @@ void dpnp_vander_c(const void* array1_in, void* result1, const size_t size_in, c
     if (!size_in || !N)
         return;
 
-    DPNPC_ptr_adapter<_DataType_input> input1_ptr(array1_in, size_in, true);
-    DPNPC_ptr_adapter<_DataType_output> result_ptr(result1, size_in * N, true, true);
+    DPNPC_ptr_adapter<_DataType_input> input1_ptr(DPNP_QUEUE, array1_in, size_in, true);
+    DPNPC_ptr_adapter<_DataType_output> result_ptr(DPNP_QUEUE, result1, size_in * N, true, true);
     const _DataType_input* array_in = input1_ptr.get_ptr();
     _DataType_output* result = result_ptr.get_ptr();
 
@@ -347,7 +347,7 @@ void dpnp_trace_c(const void* array1_in, void* result_in, const shape_elem_type*
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size * last_dim);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size * last_dim);
     const _DataType* input = input1_ptr.get_ptr();
     _ResultType* result = reinterpret_cast<_ResultType*>(result_in);
 
@@ -453,8 +453,8 @@ void dpnp_tril_c(void* array_in,
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array_in, input_size, true);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1, res_size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array_in, input_size, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1, res_size, true, true);
     _DataType* array_m = input1_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();
 
@@ -561,8 +561,8 @@ void dpnp_triu_c(void* array_in,
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array_in, input_size, true);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1, res_size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array_in, input_size, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1, res_size, true, true);
     _DataType* array_m = input1_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();
 

@@ -80,7 +80,7 @@ class dpnp_cov_c_kernel2;
 template <typename _DataType>
 void dpnp_cov_c(void* array1_in, void* result1, size_t nrows, size_t ncols)
 {
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, nrows * ncols);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, nrows * ncols);
     _DataType* array_1 = input1_ptr.get_ptr();
     _DataType* result = reinterpret_cast<_DataType*>(result1);
 
@@ -161,8 +161,8 @@ void dpnp_count_nonzero_c(void* array1_in, void* result1_out, size_t size)
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType_input> input1_ptr(array1_in, size, true);
-    DPNPC_ptr_adapter<_DataType_output> result_ptr(result1_out, 1, true, true);
+    DPNPC_ptr_adapter<_DataType_input> input1_ptr(DPNP_QUEUE, array1_in, size, true);
+    DPNPC_ptr_adapter<_DataType_output> result_ptr(DPNP_QUEUE, result1_out, 1, true, true);
     _DataType_input* array1 = input1_ptr.get_ptr();
     _DataType_output* result1 = result_ptr.get_ptr();
 
@@ -197,8 +197,8 @@ void dpnp_max_c(void* array1_in,
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size_input, true);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1, result_size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size_input, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1, result_size, true, true);
     _DataType* array_1 = input1_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();
 
@@ -393,8 +393,8 @@ void dpnp_mean_c(void* array1_in,
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size, true);
-    DPNPC_ptr_adapter<_ResultType> result_ptr(result1, 1, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size, true);
+    DPNPC_ptr_adapter<_ResultType> result_ptr(DPNP_QUEUE, result1, 1, true, true);
     _DataType* array = input1_ptr.get_ptr();
     _ResultType* result = result_ptr.get_ptr();
 
@@ -436,7 +436,7 @@ void dpnp_median_c(void* array1_in,
         return;
     }
 
-    DPNPC_ptr_adapter<_ResultType> result_ptr(result1, 1, true, true);
+    DPNPC_ptr_adapter<_ResultType> result_ptr(DPNP_QUEUE, result1, 1, true, true);
     _ResultType* result = result_ptr.get_ptr();
 
     _DataType* sorted = reinterpret_cast<_DataType*>(dpnp_memory_alloc_c(size * sizeof(_DataType)));
@@ -477,8 +477,8 @@ void dpnp_min_c(void* array1_in,
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size_input, true);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1, result_size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size_input, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1, result_size, true, true);
     _DataType* array_1 = input1_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();
 
@@ -662,9 +662,9 @@ void dpnp_nanvar_c(void* array1_in, void* mask_arr1, void* result1, const size_t
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, arr_size, true);
-    DPNPC_ptr_adapter<bool> input2_ptr(mask_arr1, arr_size, true);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1, result_size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, arr_size, true);
+    DPNPC_ptr_adapter<bool> input2_ptr(DPNP_QUEUE, mask_arr1, arr_size, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1, result_size, true, true);
     _DataType* array1 = input1_ptr.get_ptr();
     bool* mask_arr = input2_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();
@@ -755,8 +755,8 @@ void dpnp_var_c(void* array1_in,
     }
 
     sycl::event event;
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size);
-    DPNPC_ptr_adapter<_ResultType> result_ptr(result1, 1, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size);
+    DPNPC_ptr_adapter<_ResultType> result_ptr(DPNP_QUEUE, result1, 1, true, true);
     _DataType* array1 = input1_ptr.get_ptr();
     _ResultType* result = result_ptr.get_ptr();
 

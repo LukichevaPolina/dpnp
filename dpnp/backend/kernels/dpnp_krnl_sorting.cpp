@@ -53,8 +53,8 @@ class dpnp_argsort_c_kernel;
 template <typename _DataType, typename _idx_DataType>
 void dpnp_argsort_c(void* array1_in, void* result1, size_t size)
 {
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size, true);
-    DPNPC_ptr_adapter<_idx_DataType> result1_ptr(result1, size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size, true);
+    DPNPC_ptr_adapter<_idx_DataType> result1_ptr(DPNP_QUEUE, result1, size, true, true);
     _DataType* array_1 = input1_ptr.get_ptr();
     _idx_DataType* result = result1_ptr.get_ptr();
 
@@ -111,9 +111,9 @@ void dpnp_partition_c(
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size, true);
-    DPNPC_ptr_adapter<_DataType> input2_ptr(array2_in, size, true);
-    DPNPC_ptr_adapter<_DataType> result1_ptr(result1, size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size, true);
+    DPNPC_ptr_adapter<_DataType> input2_ptr(DPNP_QUEUE, array2_in, size, true);
+    DPNPC_ptr_adapter<_DataType> result1_ptr(DPNP_QUEUE, result1, size, true, true);
     _DataType* arr = input1_ptr.get_ptr();
     _DataType* arr2 = input2_ptr.get_ptr();
     _DataType* result = result1_ptr.get_ptr();
@@ -198,8 +198,8 @@ void dpnp_searchsorted_c(
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, arr_size);
-    DPNPC_ptr_adapter<_DataType> input2_ptr(v1_in, v_size);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, arr_size);
+    DPNPC_ptr_adapter<_DataType> input2_ptr(DPNP_QUEUE, v1_in, v_size);
     const _DataType* arr = input1_ptr.get_ptr();
     const _DataType* v = input2_ptr.get_ptr();
     _IndexingType* result = reinterpret_cast<_IndexingType*>(result1);
@@ -284,8 +284,8 @@ class dpnp_sort_c_kernel;
 template <typename _DataType>
 void dpnp_sort_c(void* array1_in, void* result1, size_t size)
 {
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size, true);
-    DPNPC_ptr_adapter<_DataType> result1_ptr(result1, size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size, true);
+    DPNPC_ptr_adapter<_DataType> result1_ptr(DPNP_QUEUE, result1, size, true, true);
     _DataType* array_1 = input1_ptr.get_ptr();
     _DataType* result = result1_ptr.get_ptr();
 

@@ -68,7 +68,7 @@ void dpnp_fft_fft_sycl_c(const void* array1_in,
 
     const double kernel_pi = inverse ? -M_PI : M_PI;
 
-    DPNPC_ptr_adapter<_DataType_input> input1_ptr(array1_in, input_size);
+    DPNPC_ptr_adapter<_DataType_input> input1_ptr(DPNP_QUEUE, array1_in, input_size);
     const _DataType_input* array_1 = input1_ptr.get_ptr();
     _DataType_output* result = reinterpret_cast<_DataType_output*>(result1);
 
@@ -176,8 +176,8 @@ void dpnp_fft_fft_mathlib_compute_c(const void* array1_in,
 {
     sycl::event event;
 
-    DPNPC_ptr_adapter<_DataType_input> input1_ptr(array1_in, result_size);
-    DPNPC_ptr_adapter<_DataType_output> result_ptr(result1, result_size);
+    DPNPC_ptr_adapter<_DataType_input> input1_ptr(DPNP_QUEUE, array1_in, result_size);
+    DPNPC_ptr_adapter<_DataType_output> result_ptr(DPNP_QUEUE, result1, result_size);
     _DataType_input* array_1 = input1_ptr.get_ptr();
     _DataType_output* result = result_ptr.get_ptr();
 

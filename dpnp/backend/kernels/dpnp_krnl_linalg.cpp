@@ -40,8 +40,8 @@ void dpnp_cholesky_c(void* array1_in, void* result1, const size_t size, const si
 {
     sycl::event event;
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, size, true);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1, size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, size, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1, size, true, true);
     _DataType* in_array = input1_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();
 
@@ -116,8 +116,8 @@ void dpnp_det_c(void* array1_in, void* result1, shape_elem_type* shape, size_t n
         }
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, input_size, true);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1, size_out, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, input_size, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1, size_out, true, true);
     _DataType* array_1 = input1_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();
 
@@ -212,8 +212,8 @@ void dpnp_inv_c(void* array1_in, void* result1, shape_elem_type* shape, size_t n
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, input_size, true);
-    DPNPC_ptr_adapter<_ResultType> result_ptr(result1, input_size, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, input_size, true);
+    DPNPC_ptr_adapter<_ResultType> result_ptr(DPNP_QUEUE, result1, input_size, true, true);
     _DataType* array_1 = input1_ptr.get_ptr();
     _ResultType* result = result_ptr.get_ptr();
 
@@ -326,9 +326,9 @@ void dpnp_kron_c(void* array1_in,
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType1> input1_ptr(array1_in, input1_size);
-    DPNPC_ptr_adapter<_DataType2> input2_ptr(array2_in, input2_size);
-    DPNPC_ptr_adapter<_ResultType> result_ptr(result1, result_size);
+    DPNPC_ptr_adapter<_DataType1> input1_ptr(DPNP_QUEUE, array1_in, input1_size);
+    DPNPC_ptr_adapter<_DataType2> input2_ptr(DPNP_QUEUE, array2_in, input2_size);
+    DPNPC_ptr_adapter<_ResultType> result_ptr(DPNP_QUEUE, result1, result_size);
     _DataType1* array1 = input1_ptr.get_ptr();
     _DataType2* array2 = input2_ptr.get_ptr();
     _ResultType* result = result_ptr.get_ptr();
@@ -392,8 +392,8 @@ void dpnp_matrix_rank_c(void* array1_in, void* result1, shape_elem_type* shape, 
         return;
     }
 
-    DPNPC_ptr_adapter<_DataType> input1_ptr(array1_in, input_size, true);
-    DPNPC_ptr_adapter<_DataType> result_ptr(result1, 1, true, true);
+    DPNPC_ptr_adapter<_DataType> input1_ptr(DPNP_QUEUE, array1_in, input_size, true);
+    DPNPC_ptr_adapter<_DataType> result_ptr(DPNP_QUEUE, result1, 1, true, true);
     _DataType* array_1 = input1_ptr.get_ptr();
     _DataType* result = result_ptr.get_ptr();
 
@@ -430,7 +430,7 @@ void dpnp_qr_c(void* array1_in, void* result1, void* result2, void* result3, siz
 {
     sycl::event event;
 
-    DPNPC_ptr_adapter<_InputDT> input1_ptr(array1_in, size_m * size_n, true);
+    DPNPC_ptr_adapter<_InputDT> input1_ptr(DPNP_QUEUE, array1_in, size_m * size_n, true);
     _InputDT* in_array = input1_ptr.get_ptr();
 
     // math lib func overrides input
@@ -445,9 +445,9 @@ void dpnp_qr_c(void* array1_in, void* result1, void* result2, void* result3, siz
         }
     }
 
-    DPNPC_ptr_adapter<_ComputeDT> result1_ptr(result1, size_m * size_m, true, true);
-    DPNPC_ptr_adapter<_ComputeDT> result2_ptr(result2, size_m * size_n, true, true);
-    DPNPC_ptr_adapter<_ComputeDT> result3_ptr(result3, std::min(size_m, size_n), true, true);
+    DPNPC_ptr_adapter<_ComputeDT> result1_ptr(DPNP_QUEUE, result1, size_m * size_m, true, true);
+    DPNPC_ptr_adapter<_ComputeDT> result2_ptr(DPNP_QUEUE, result2, size_m * size_n, true, true);
+    DPNPC_ptr_adapter<_ComputeDT> result3_ptr(DPNP_QUEUE, result3, std::min(size_m, size_n), true, true);
     _ComputeDT* res_q = result1_ptr.get_ptr();
     _ComputeDT* res_r = result2_ptr.get_ptr();
     _ComputeDT* tau = result3_ptr.get_ptr();
@@ -531,7 +531,7 @@ void dpnp_svd_c(void* array1_in, void* result1, void* result2, void* result3, si
 {
     sycl::event event;
 
-    DPNPC_ptr_adapter<_InputDT> input1_ptr(array1_in, size_m * size_n, true); // TODO no need this if use dpnp_copy_to()
+    DPNPC_ptr_adapter<_InputDT> input1_ptr(DPNP_QUEUE, array1_in, size_m * size_n, true); // TODO no need this if use dpnp_copy_to()
     _InputDT* in_array = input1_ptr.get_ptr();
 
     // math lib gesvd func overrides input
@@ -541,9 +541,9 @@ void dpnp_svd_c(void* array1_in, void* result1, void* result2, void* result3, si
         in_a[it] = in_array[it]; // TODO Type conversion. memcpy can not be used directly. dpnp_copy_to() ?
     }
 
-    DPNPC_ptr_adapter<_ComputeDT> result1_ptr(result1, size_m * size_m, true, true);
-    DPNPC_ptr_adapter<_SVDT> result2_ptr(result2, std::min(size_m, size_n), true, true);
-    DPNPC_ptr_adapter<_ComputeDT> result3_ptr(result3, size_n * size_n, true, true);
+    DPNPC_ptr_adapter<_ComputeDT> result1_ptr(DPNP_QUEUE, result1, size_m * size_m, true, true);
+    DPNPC_ptr_adapter<_SVDT> result2_ptr(DPNP_QUEUE, result2, std::min(size_m, size_n), true, true);
+    DPNPC_ptr_adapter<_ComputeDT> result3_ptr(DPNP_QUEUE, result3, size_n * size_n, true, true);
     _ComputeDT* res_u = result1_ptr.get_ptr();
     _SVDT* res_s = result2_ptr.get_ptr();
     _ComputeDT* res_vt = result3_ptr.get_ptr();
