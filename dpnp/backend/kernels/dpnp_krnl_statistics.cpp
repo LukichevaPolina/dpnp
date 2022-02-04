@@ -1304,6 +1304,39 @@ void func_map_init_statistics(func_map_t& fmap)
     fmap[DPNPFuncName::DPNP_FN_CORRELATE][eft_DBL][eft_DBL] = {
         eft_DBL, (void*)dpnp_correlate_default_c<double, double, double>};
 
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_INT][eft_INT] = {
+        eft_INT, (void*)dpnp_correlate_ext_c<int32_t, int32_t, int32_t>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_INT][eft_LNG] = {
+        eft_LNG, (void*)dpnp_correlate_ext_c<int64_t, int32_t, int64_t>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_INT][eft_FLT] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, int32_t, float>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_INT][eft_DBL] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, int32_t, double>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_LNG][eft_INT] = {
+        eft_LNG, (void*)dpnp_correlate_ext_c<int64_t, int64_t, int32_t>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_LNG][eft_LNG] = {
+        eft_LNG, (void*)dpnp_correlate_ext_c<int64_t, int64_t, int64_t>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_LNG][eft_FLT] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, int64_t, float>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_LNG][eft_DBL] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, int64_t, double>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_FLT][eft_INT] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, float, int32_t>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_FLT][eft_LNG] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, float, int64_t>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_FLT][eft_FLT] = {
+        eft_FLT, (void*)dpnp_correlate_ext_c<float, float, float>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_FLT][eft_DBL] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, float, double>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_DBL][eft_INT] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, double, int32_t>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_DBL][eft_LNG] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, double, int64_t>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_DBL][eft_FLT] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, double, float>};
+    fmap[DPNPFuncName::DPNP_FN_CORRELATE_EXT][eft_DBL][eft_DBL] = {
+        eft_DBL, (void*)dpnp_correlate_ext_c<double, double, double>};
+
     fmap[DPNPFuncName::DPNP_FN_COUNT_NONZERO][eft_BLN][eft_BLN] = {
         eft_LNG, (void*)dpnp_count_nonzero_default_c<bool, int64_t>};
     fmap[DPNPFuncName::DPNP_FN_COUNT_NONZERO][eft_INT][eft_INT] = {
@@ -1314,6 +1347,17 @@ void func_map_init_statistics(func_map_t& fmap)
         eft_LNG, (void*)dpnp_count_nonzero_default_c<float, int64_t>};
     fmap[DPNPFuncName::DPNP_FN_COUNT_NONZERO][eft_DBL][eft_DBL] = {
         eft_LNG, (void*)dpnp_count_nonzero_default_c<double, int64_t>};
+
+    fmap[DPNPFuncName::DPNP_FN_COUNT_NONZERO_EXT][eft_BLN][eft_BLN] = {
+        eft_LNG, (void*)dpnp_count_nonzero_ext_c<bool, int64_t>};
+    fmap[DPNPFuncName::DPNP_FN_COUNT_NONZERO_EXT][eft_INT][eft_INT] = {
+        eft_LNG, (void*)dpnp_count_nonzero_ext_c<int32_t, int64_t>};
+    fmap[DPNPFuncName::DPNP_FN_COUNT_NONZERO_EXT][eft_LNG][eft_LNG] = {
+        eft_LNG, (void*)dpnp_count_nonzero_ext_c<int64_t, int64_t>};
+    fmap[DPNPFuncName::DPNP_FN_COUNT_NONZERO_EXT][eft_FLT][eft_FLT] = {
+        eft_LNG, (void*)dpnp_count_nonzero_ext_c<float, int64_t>};
+    fmap[DPNPFuncName::DPNP_FN_COUNT_NONZERO_EXT][eft_DBL][eft_DBL] = {
+        eft_LNG, (void*)dpnp_count_nonzero_ext_c<double, int64_t>};
 
     fmap[DPNPFuncName::DPNP_FN_COV][eft_INT][eft_INT] = {eft_DBL, (void*)dpnp_cov_default_c<double>};
     fmap[DPNPFuncName::DPNP_FN_COV][eft_LNG][eft_LNG] = {eft_DBL, (void*)dpnp_cov_default_c<double>};
