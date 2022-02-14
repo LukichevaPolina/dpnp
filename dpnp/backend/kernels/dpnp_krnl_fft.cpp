@@ -372,5 +372,18 @@ void func_map_init_fft_func(func_map_t& fmap)
         eft_C64, (void*)dpnp_fft_fft_default_c<std::complex<float>, std::complex<float>>};
     fmap[DPNPFuncName::DPNP_FN_FFT_FFT][eft_C128][eft_C128] = {
         eft_C128, (void*)dpnp_fft_fft_default_c<std::complex<double>, std::complex<double>>};
+
+    fmap[DPNPFuncName::DPNP_FN_FFT_FFT_EXT][eft_INT][eft_INT] = {
+        eft_C128, (void*)dpnp_fft_fft_ext_c<int32_t, std::complex<double>>};
+    fmap[DPNPFuncName::DPNP_FN_FFT_FFT_EXT][eft_LNG][eft_LNG] = {
+        eft_C128, (void*)dpnp_fft_fft_ext_c<int64_t, std::complex<double>>};
+    fmap[DPNPFuncName::DPNP_FN_FFT_FFT_EXT][eft_FLT][eft_FLT] = {
+        eft_C64, (void*)dpnp_fft_fft_ext_c<float, std::complex<float>>};
+    fmap[DPNPFuncName::DPNP_FN_FFT_FFT_EXT][eft_DBL][eft_DBL] = {
+        eft_C128, (void*)dpnp_fft_fft_ext_c<double, std::complex<double>>};
+    fmap[DPNPFuncName::DPNP_FN_FFT_FFT_EXT][eft_C64][eft_C64] = {
+        eft_C64, (void*)dpnp_fft_fft_ext_c<std::complex<float>, std::complex<float>>};
+    fmap[DPNPFuncName::DPNP_FN_FFT_FFT_EXT][eft_C128][eft_C128] = {
+        eft_C128, (void*)dpnp_fft_fft_ext_c<std::complex<double>, std::complex<double>>};
     return;
 }
