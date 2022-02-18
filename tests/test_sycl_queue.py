@@ -357,4 +357,15 @@ def test_svd(device):
 
     assert_sycl_queue_equal(dpnp_vt_queue, expected_queue)
     assert dpnp_vt_queue.sycl_device == expected_queue.sycl_device
-    
+
+
+@pytest.mark.parametrize("usm_type",
+                        ["host", "device", "shared"])
+def test_uniform(usm_type):
+    seed = 123
+    low = 1.0
+    high = 2.0
+    res = dpnp.random.uniform(low, high, usm_type=usm_type)
+
+    res_usm_type = res.get_array().usm_type
+    assert usm_type == res_usm_type
